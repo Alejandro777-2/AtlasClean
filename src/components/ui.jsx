@@ -6,16 +6,34 @@ import { useId } from 'react';
 
 const cx = (...c) => c.filter(Boolean).join(' ');
 
-export function Marca() {
+/** Logotipo de Atlas en SVG (sin dependencias). Letras blancas: pensado para fondo marino. */
+export function AtlasLogo({ height = 44, letters = '#FFFFFF', orb = '#3DC8FF', glow = true, className = 'logo', title = 'Atlas' }) {
   return (
-    <span className="marca">
-      <span className="marca__simbolo" aria-hidden="true">A</span>
-      Atlas
-    </span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -36 288 100" height={height} className={className} role="img" aria-label={title}>
+      <title>{title}</title>
+      <g fill={letters}>
+        <polygon points="0.00,60.00 27.00,0.00 54.00,60.00 45.56,60.00 27.00,18.76 8.44,60.00" />
+        <polygon points="60.00,0.00 106.00,0.00 106.00,7.00 86.85,7.00 86.85,60.00 79.15,60.00 79.15,7.00 60.00,7.00" />
+        <polygon points="120.00,0.00 127.70,0.00 127.70,53.00 158.00,53.00 158.00,60.00 120.00,60.00" />
+        <polygon points="168.00,60.00 195.00,0.00 222.00,60.00 213.56,60.00 195.00,18.76 176.44,60.00" />
+      </g>
+      <g stroke={letters}>
+        <path
+          transform="translate(238.0 0)"
+          d="M34 14 C34 6 27 3.7 19 3.7 C10 3.7 4.5 8.5 4.5 15.5 C4.5 23.5 11 26.5 19 29.5 C28 32.8 34 36 34 44.5 C34 52 28 56.3 19 56.3 C10 56.3 4 52.5 3.5 45"
+          fill="none"
+          strokeWidth="7.4"
+          strokeLinecap="butt"
+          strokeLinejoin="round"
+        />
+      </g>
+      {glow && <circle cx="27" cy="-11.5" r="21" fill={orb} opacity="0.28" />}
+      <circle cx="27" cy="-11.5" r="12" fill={orb} />
+    </svg>
   );
 }
 
-/** variante: 'primario' | 'destacado' | 'secundario' | 'fantasma'. Con `href` se pinta como enlace. */
+/** variante: 'primario' | 'destacado' | 'secundario' | 'contorno' | 'fantasma'. Con `href` se pinta como enlace. */
 export function Boton({ variante = 'secundario', href, className, ...props }) {
   const clase = cx('boton', `boton--${variante}`, className);
   return href ? <a href={href} className={clase} {...props} /> : <button type="button" className={clase} {...props} />;
@@ -24,17 +42,6 @@ export function Boton({ variante = 'secundario', href, className, ...props }) {
 /** tono: 'neutro' | 'ok' | 'aviso' | 'error' | 'info' */
 export function Insignia({ tono = 'neutro', children }) {
   return <span className={cx('insignia', tono !== 'neutro' && `insignia--${tono}`)}>{children}</span>;
-}
-
-/** variante: 'destacada' | 'oscura'. Sin `valor` muestra un guion: nunca cifras inventadas. */
-export function TarjetaKpi({ etiqueta, valor = '—', detalle, variante }) {
-  return (
-    <div className={cx('kpi', variante && `kpi--${variante}`)}>
-      <span className="kpi__etiqueta">{etiqueta}</span>
-      <span className="kpi__valor">{valor}</span>
-      {detalle && <span className="kpi__detalle">{detalle}</span>}
-    </div>
-  );
 }
 
 /** `children` es una función que recibe el id para enlazar la etiqueta con el control. */
@@ -47,59 +54,6 @@ export function Campo({ etiqueta, ayuda, children }) {
       </label>
       {children(id)}
       {ayuda && <span className="campo__ayuda">{ayuda}</span>}
-    </div>
-  );
-}
-
-/**
- * columnas: [{ clave, titulo, numerica }]
- * pie: fila de totales opcional con las mismas claves
- */
-export function Tabla({ columnas, filas, pie, vacio = 'Sin datos.' }) {
-  const clase = (c) => (c.numerica ? 'num' : undefined);
-  return (
-    <div className="tabla-contenedor">
-      <table className="tabla">
-        <thead>
-          <tr>
-            {columnas.map((c) => (
-              <th key={c.clave} scope="col" className={clase(c)}>
-                {c.titulo}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {filas.length === 0 ? (
-            <tr>
-              <td colSpan={columnas.length} className="tabla__vacio">
-                {vacio}
-              </td>
-            </tr>
-          ) : (
-            filas.map((f, i) => (
-              <tr key={f.id ?? i}>
-                {columnas.map((c) => (
-                  <td key={c.clave} className={clase(c)}>
-                    {f[c.clave]}
-                  </td>
-                ))}
-              </tr>
-            ))
-          )}
-        </tbody>
-        {pie && (
-          <tfoot>
-            <tr>
-              {columnas.map((c) => (
-                <td key={c.clave} className={clase(c)}>
-                  {pie[c.clave]}
-                </td>
-              ))}
-            </tr>
-          </tfoot>
-        )}
-      </table>
     </div>
   );
 }
