@@ -210,3 +210,105 @@
   .hero h1 { font-size: var(--t-2xl); }
   .intake__fila { grid-template-columns: 1fr; }
 }
+
+/* ── Login y Autenticación ── */
+.login-pantalla { min-height: 100vh; display: flex; flex-direction: column; background: var(--crema); }
+.login-contenedor { flex: 1; display: grid; place-items: center; padding: var(--e5) var(--e4); }
+.login-tarjeta { width: 100%; max-width: 480px; padding: var(--e6); }
+.login-tarjeta__cab { text-align: center; margin-bottom: var(--e5); display: flex; flex-direction: column; align-items: center; gap: var(--e2); }
+.login-tarjeta__cab h1 { font-size: var(--t-2xl); font-weight: 800; color: var(--marino); }
+.login-logo-circulo { width: 56px; height: 56px; border-radius: var(--radio); background: var(--marino); display: grid; place-items: center; margin-bottom: var(--e2); }
+.login-logo-circulo .marca__simbolo { width: 36px; height: 36px; font-size: var(--t-lg); }
+.login-form { display: grid; gap: var(--e4); }
+.login-credenciales-demo { background: var(--superficie-2); border: 1px dashed var(--azul); border-radius: var(--radio); padding: var(--e3); display: flex; flex-direction: column; gap: var(--e2); font-size: var(--t-xs); }
+.login-credenciales-demo code { background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--linea); font-weight: bold; }
+.login-pie { margin-top: var(--e5); text-align: center; font-size: var(--t-xs); border-top: 1px solid var(--linea); padding-top: var(--e3); }
+.boton-ancho-total { width: 100%; }
+.boton--pequeno { min-height: 30px; padding: 0 var(--e3); font-size: var(--t-xs); }
+
+/* ── Alertas y Mensajes ── */
+.alerta-error { display: flex; align-items: center; gap: var(--e2); padding: var(--e3); border-radius: var(--radio); background: var(--error-suave); color: var(--error); font-size: var(--t-sm); font-weight: 600; margin-bottom: var(--e4); }
+.banner-exito { display: flex; align-items: center; justify-content: space-between; gap: var(--e3); padding: var(--e3) var(--e4); border-radius: var(--radio); background: var(--ok-suave); color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent); font-size: var(--t-sm); font-weight: 600; }
+
+/* ── Asistente IA ── */
+.asistente-ia-contenedor { background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio-lg); padding: var(--e5); margin-bottom: var(--e5); box-shadow: var(--sombra-sm); }
+.asistente-ia-cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--e4); margin-bottom: var(--e4); }
+.asistente-ia-titulo-grupo { display: flex; gap: var(--e3); align-items: flex-start; }
+.asistente-ia-icono { width: 36px; height: 36px; border-radius: var(--radio-sm); background: linear-gradient(135deg, var(--cian), var(--azul)); color: var(--marino); display: grid; place-items: center; font-size: var(--t-xl); font-weight: 800; flex: none; }
+.asistente-ia-cabecera h3 { font-size: var(--t-lg); font-weight: 800; color: var(--marino); }
+.asistente-ia-grid { display: grid; grid-template-columns: 1fr; gap: var(--e4); }
+.asistente-dropzone {
+  display: grid; gap: var(--e2); padding: var(--e5); text-align: center; cursor: pointer;
+  background: var(--info-suave); border: 2px dashed var(--azul); border-radius: var(--radio-lg);
+  transition: all 150ms ease;
+}
+.asistente-dropzone:hover, .asistente-dropzone--activo { border-color: var(--marino); background: color-mix(in srgb, var(--info-suave) 80%, white); }
+.dropzone-icono { font-size: 32px; }
+.asistente-cargando { display: flex; align-items: center; justify-content: center; gap: var(--e2); color: var(--info); font-weight: 700; margin-top: var(--e2); }
+.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(14, 39, 72, 0.2); border-top-color: var(--cian); border-radius: 50%; animation: girar 0.6s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+.demo-chips-seccion { margin-top: var(--e3); display: flex; flex-direction: column; align-items: center; gap: var(--e2); }
+.demo-botones-grupo { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--e2); }
+
+.asistente-panel-recomendacion { background: #fdfefe; border: 2px solid var(--cian); padding: var(--e5); border-radius: var(--radio-lg); }
+.panel-rec-cab { display: flex; align-items: center; justify-content: space-between; gap: var(--e4); margin-bottom: var(--e4); flex-wrap: wrap; }
+.panel-rec-cab h4 { font-size: var(--t-xl); font-weight: 800; color: var(--marino); margin-top: var(--e1); }
+.boton--aplicar-ia { font-size: var(--t-sm); padding: 0 var(--e4); height: 42px; }
+.rec-grid-detalles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e4); }
+.rec-item { display: flex; flex-direction: column; gap: 4px; background: var(--superficie-2); padding: var(--e3); border-radius: var(--radio); border: 1px solid var(--linea); }
+.rec-item__titulo { font-size: var(--t-xs); font-weight: 700; text-transform: uppercase; color: var(--info); }
+.rec-item__valor { font-size: var(--t-sm); color: var(--marino); }
+.rec-lista-chips { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.rec-alertas-lista { list-style: none; padding: 0; margin: 4px 0 0; font-size: var(--t-xs); color: var(--aviso); display: grid; gap: 4px; }
+
+/* ── Formularios y Bloques ── */
+.formulario-bloques { display: grid; gap: var(--e5); }
+.formulario-bloque { background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio-lg); padding: var(--e5); box-shadow: var(--sombra-sm); }
+.formulario-bloque__cab { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--linea); padding-bottom: var(--e3); margin-bottom: var(--e4); }
+.formulario-bloque__cab h3 { font-size: var(--t-lg); font-weight: 800; color: var(--marino); }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--e4); }
+.form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--e4); }
+.form-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--e4); }
+
+/* ── Selectores de Riesgo Visual ── */
+.selector-riesgo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--e3); }
+.opcion-riesgo {
+  padding: var(--e3); border: 2px solid var(--linea); border-radius: var(--radio); cursor: pointer;
+  background: var(--superficie); display: flex; flex-direction: column; gap: var(--e1); text-align: left;
+  transition: all 120ms ease;
+}
+.opcion-riesgo:hover { border-color: var(--azul); }
+.opcion-riesgo--activa { border-color: var(--marino); box-shadow: var(--foco); background: var(--superficie-2); }
+.opcion-riesgo strong { font-size: var(--t-sm); font-weight: 800; }
+.opcion-riesgo span { font-size: var(--t-xs); color: var(--texto-suave); }
+
+/* ── Áreas con Licencia ── */
+.areas-licencia-caja { background: var(--superficie-2); border: 1px solid var(--linea); border-radius: var(--radio); padding: var(--e4); margin-top: var(--e3); }
+.areas-licencia-lista { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--e2); margin-top: var(--e2); }
+.checkbox-licencia { display: flex; align-items: flex-start; gap: var(--e2); font-size: var(--t-sm); cursor: pointer; }
+.checkbox-licencia input { margin-top: 3px; accent-color: var(--azul); }
+
+/* ── Controles de Dotación Personal ── */
+.contador-grupo { display: flex; align-items: center; border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; background: #fff; }
+.contador-boton { width: 40px; height: 40px; background: var(--superficie-2); border: 0; font-size: var(--t-lg); font-weight: bold; cursor: pointer; color: var(--marino); }
+.contador-boton:hover { background: color-mix(in srgb, var(--cian) 30%, transparent); }
+.contador-valor { flex: 1; text-align: center; font-size: var(--t-lg); font-weight: 800; }
+
+/* ── Resumen de Costos y Acciones Excel ── */
+.barra-acciones-excel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); padding: var(--e4); background: var(--marino); color: #fff; border-radius: var(--radio-lg); margin-top: var(--e5); }
+.barra-acciones-excel__info { display: flex; flex-direction: column; gap: 2px; }
+.barra-acciones-excel__info h4 { font-size: var(--t-lg); font-weight: 800; color: #fff; }
+.barra-acciones-excel__info p { font-size: var(--t-xs); color: var(--texto-sobre-marino); }
+.barra-acciones-excel__botones { display: flex; flex-wrap: wrap; gap: var(--e2); }
+
+.propuesta-tarjeta { background: #fff; border: 2px solid var(--linea); border-radius: var(--radio-lg); padding: var(--e5); }
+.propuesta-cabecera { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--marino); padding-bottom: var(--e4); margin-bottom: var(--e4); }
+.propuesta-tabla { width: 100%; border-collapse: collapse; margin: var(--e4) 0; }
+.propuesta-tabla td, .propuesta-tabla th { padding: 10px 14px; border-bottom: 1px solid var(--linea); }
+.propuesta-tabla th { background: var(--superficie-2); font-weight: 700; text-align: left; }
+.propuesta-total-fila { font-size: var(--t-lg); font-weight: 800; background: var(--info-suave); }
+
+@media (max-width: 900px) {
+  .rec-grid-detalles, .form-grid-2, .form-grid-3, .form-grid-4, .selector-riesgo-grid, .areas-licencia-lista { grid-template-columns: 1fr; }
+  .barra-acciones-excel { flex-direction: column; align-items: stretch; }
+}
