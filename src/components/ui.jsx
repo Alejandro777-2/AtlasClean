@@ -44,6 +44,17 @@ export function Insignia({ tono = 'neutro', children }) {
   return <span className={cx('insignia', tono !== 'neutro' && `insignia--${tono}`)}>{children}</span>;
 }
 
+/** variante: 'destacada' | 'oscura'. Sin `valor` muestra un guion: nunca cifras inventadas. */
+export function TarjetaKpi({ etiqueta, valor = '—', detalle, variante }) {
+  return (
+    <div className={cx('kpi', variante && `kpi--${variante}`)}>
+      <span className="kpi__etiqueta">{etiqueta}</span>
+      <span className="kpi__valor">{valor}</span>
+      {detalle && <span className="kpi__detalle">{detalle}</span>}
+    </div>
+  );
+}
+
 /** `children` es una función que recibe el id para enlazar la etiqueta con el control. */
 export function Campo({ etiqueta, ayuda, children }) {
   const id = useId();

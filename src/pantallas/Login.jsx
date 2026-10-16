@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Boton, Campo, Insignia, Marca } from '../components/ui.jsx';
+import { Boton, Campo, Insignia, AtlasLogo } from '../components/ui.jsx';
 
 export default function Login({ alAutenticar }) {
   const [usuario, setUsuario] = useState('');
@@ -47,7 +47,7 @@ export default function Login({ alAutenticar }) {
       <header className="portada-nav">
         <div className="portada-nav__interior">
           <a href="#/" className="lateral__marca" aria-label="Volver a inicio">
-            <Marca />
+            <AtlasLogo height={32} />
           </a>
           <a href="#/" className="boton boton--fantasma">
             ← Volver al portal

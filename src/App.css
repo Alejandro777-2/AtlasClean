@@ -312,3 +312,61 @@
   .rec-grid-detalles, .form-grid-2, .form-grid-3, .form-grid-4, .selector-riesgo-grid, .areas-licencia-lista { grid-template-columns: 1fr; }
   .barra-acciones-excel { flex-direction: column; align-items: stretch; }
 }
+
+/* Armazón de la plataforma (flujo de login y cotización), recuperado de la estructura base. */
+/* ── Plataforma ── */
+.plataforma {
+  display: grid; min-height: 100vh;
+  grid-template-columns: 256px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: 'lateral superior' 'lateral contenido';
+}
+.lateral {
+  grid-area: lateral; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: var(--e5); padding: var(--e5) var(--e3);
+  background: var(--marino); color: #fff;
+}
+.lateral__marca { padding: 0 var(--e2); text-decoration: none; border-radius: var(--radio-sm); }
+.lateral__rotulo { margin-bottom: var(--e2); padding: 0 var(--e3); font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto-sobre-marino-suave); }
+.lateral__pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.lateral__paso {
+  display: flex; align-items: center; gap: var(--e3); padding: var(--e2) var(--e3);
+  border-radius: var(--radio); font-size: var(--t-sm); font-weight: 600; text-decoration: none; color: var(--texto-sobre-marino);
+}
+.lateral__paso:hover { background: var(--marino-2); color: #fff; }
+.lateral__paso[aria-current='page'] {
+  color: #fff; box-shadow: inset 3px 0 0 var(--cian);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cian) 18%, transparent), transparent);
+}
+.lateral__num { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--marino-linea); font-size: var(--t-xs); font-weight: 800; }
+.lateral__paso[aria-current='page'] .lateral__num { border-color: var(--cian); color: var(--cian); }
+.lateral__volver { margin-top: auto; padding: var(--e3) var(--e3) 0; border-top: 1px solid var(--marino-linea); font-size: var(--t-sm); text-decoration: none; color: var(--texto-sobre-marino-suave); }
+.lateral__volver:hover { color: #fff; }
+
+.superior {
+  grid-area: superior; position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--e4);
+  min-height: 72px; padding: var(--e3) var(--e6);
+  background: var(--superficie); border-bottom: 1px solid var(--linea);
+}
+.superior h1 { font-size: var(--t-xl); font-weight: 800; }
+.contenido { grid-area: contenido; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--e5); padding: var(--e6); }
+.kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--e3); }
+.leyenda-riesgo { display: flex; flex-wrap: wrap; gap: var(--e2); margin-bottom: var(--e4); }
+
+@media (max-width: 1100px) {
+  .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .plataforma { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; grid-template-areas: 'lateral' 'superior' 'contenido'; }
+  .lateral { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--e3); padding: var(--e3) var(--e4); }
+  .lateral nav { flex-basis: 100%; min-width: 0; }
+  .lateral__rotulo, .lateral__volver { display: none; }
+  .lateral__pasos { display: flex; overflow-x: auto; }
+  .lateral__paso { white-space: nowrap; }
+  .superior { position: static; padding: var(--e3) var(--e4); }
+  .contenido { padding: var(--e4); }
+}
+@media (max-width: 600px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -137,3 +137,33 @@ a { color: inherit; }
   background: transparent; border: 0; border-radius: var(--radio); cursor: pointer;
 }
 .pestanas__boton[aria-selected='true'] { background: var(--superficie); color: var(--texto); box-shadow: var(--sombra-sm); }
+
+/* Recuperados para el flujo de la plataforma y el login. */
+.marca__simbolo {
+  display: grid; place-items: center; width: 32px; height: 32px;
+  border-radius: var(--radio-sm); background: linear-gradient(135deg, var(--cian), var(--azul));
+  color: var(--marino);
+}
+
+/* ── Tarjeta de KPI ── */
+.kpi {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: var(--e4);
+  background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio-lg); box-shadow: var(--sombra-sm);
+}
+.kpi__etiqueta { font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--texto-suave); }
+.kpi__valor { font-size: var(--t-xl); font-weight: 800; font-variant-numeric: tabular-nums; }
+.kpi__detalle { font-size: var(--t-xs); color: var(--texto-suave); }
+.kpi--destacada { background: var(--info-suave); border-color: color-mix(in srgb, var(--info) 25%, transparent); }
+.kpi--oscura { background: var(--marino); border-color: var(--marino); color: #fff; }
+.kpi--oscura .kpi__etiqueta { color: var(--cian); }
+.kpi--oscura .kpi__detalle { color: var(--texto-sobre-marino); }
+
+/* ── Tabla con totales ── */
+.tabla-contenedor { overflow-x: auto; border: 1px solid var(--linea); border-radius: var(--radio); }
+.tabla { width: 100%; border-collapse: collapse; font-size: var(--t-sm); }
+.tabla th { padding: 10px 12px; text-align: left; font-weight: 700; color: var(--texto-suave); background: var(--superficie-2); border-bottom: 1px solid var(--linea); white-space: nowrap; }
+.tabla td { padding: 10px 12px; border-bottom: 1px solid var(--linea); }
+.tabla tbody tr:hover td { background: var(--superficie-2); }
+.tabla tfoot td { font-weight: 800; background: var(--superficie-2); border-top: 2px solid var(--marino); border-bottom: 0; }
+.tabla .num { text-align: right; font-variant-numeric: tabular-nums; }
+.tabla__vacio { padding: var(--e5); text-align: center; color: var(--texto-suave); }

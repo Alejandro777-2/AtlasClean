@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Insignia, Marca, TarjetaKpi, Campo, Boton } from '../components/ui.jsx';
+import { Insignia, AtlasLogo, TarjetaKpi, Campo, Boton } from '../components/ui.jsx';
 import { PASOS } from '../pasos.js';
 import AsistenteIA from '../components/AsistenteIA.jsx';
 import {
@@ -221,7 +221,7 @@ export default function Plataforma({ pasoId, sesion, alCerrarSesion }) {
       {/* Barra Lateral Marino (256px fijo) */}
       <aside className="lateral">
         <a href="#/" className="lateral__marca" aria-label="Atlas, volver a la portada">
-          <Marca />
+          <AtlasLogo height={32} />
         </a>
         <nav aria-label="Pasos de la cotización">
           <p className="lateral__rotulo">Cotización Reto 2</p>

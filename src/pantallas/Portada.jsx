@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import { AtlasLogo, Boton, Campo, Insignia, Pestanas } from '../components/ui.jsx';
-import { PASOS } from '../pasos.js';
+﻿import { useEffect, useRef, useState } from 'react';
+import { AtlasLogo, Boton, Campo, Pestanas } from '../components/ui.jsx';
+import ComoFunciona from './ComoFunciona.jsx';
 
 const MODOS = [
   { valor: 'formulario', etiqueta: 'Llenar requisitos' },
   { valor: 'documento', etiqueta: 'Subir pliego con IA' }
 ];
-
+// Mismas tipologías y turnos que usa la plataforma.
 const TIPOS_SITIO = [
   'Salud / Salas de hospitalización / Áreas críticas hospitalarias',
   'Comercial / Retail / Patios de comida',
@@ -14,13 +14,7 @@ const TIPOS_SITIO = [
   'Industrial / Plantas de producción / Bodegas',
   'Educativo / Institucional'
 ];
-
-const TURNOS = [
-  'Matutino (06:00 - 14:30)',
-  'Vespertino (14:00 - 22:00)',
-  'Nocturno (22:00 - 06:00)',
-  'Rotativo 24/7'
-];
+const TURNOS = ['Matutino (06:00 - 14:30)', 'Vespertino (14:00 - 22:00)', 'Nocturno (22:00 - 06:00)', 'Rotativo 24/7'];
 
 // Beneficios bajo los CTA del hero. Iconos lineales propios (SVG en línea, sin dependencias).
 const BENEFICIOS = [
@@ -51,6 +45,8 @@ const BENEFICIOS = [
 // Curva de nivel base (centrada en 0,0) que el fondo del hero repite a distintas escalas.
 const CURVA = 'M0,-100 C60,-104 110,-58 104,0 C99,56 52,96 0,98 C-66,100 -114,48 -108,-6 C-102,-60 -56,-97 0,-100Z';
 const ESCALAS = [0.5, 0.9, 1.3, 1.7, 2.1, 2.5, 2.9];
+// Grupos de anillos del fondo, cada uno con su pin en el centro. Coordenadas del viewBox 1440×640;
+// la deriva de cada grupo está en App.css (.hero__grupo--N).
 const GRUPOS = [
   { x: 170, y: 500, rot: -12, escala: 1 },
   { x: 1290, y: 230, rot: 28, escala: 0.9 },
@@ -61,11 +57,35 @@ export default function Portada({ sesion }) {
   const [modo, setModo] = useState('formulario');
   const [archivo, setArchivo] = useState(null);
   const [analizando, setAnalizando] = useState(false);
-  const [cliente, setCliente] = useState('');
-  const [tipo, setTipo] = useState('');
-  const [turno, setTurno] = useState('');
 
+  // Con sesión se entra directo a la plataforma; sin sesión, al login.
   const destinoApp = sesion ? '#/app/requisitos' : '#/login';
+
+  const irAPlataforma = (e) => {
+    e.preventDefault();
+    window.location.hash = destinoApp;
+  };
+
+  // Envía el pliego al backend (/api, proxy de Vite) y pasa a la plataforma con o sin resultado.
+  const subirDocumento = async (file) => {
+    if (!file) return;
+    setArchivo(file.name);
+    setAnalizando(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const resp = await fetch('/api/analizar-documento', { method: 'POST', body: formData });
+      if (resp.ok) {
+        const json = await resp.json();
+        if (json.datos) sessionStorage.setItem('atlas_datos_ia_precargados', JSON.stringify(json.datos));
+      }
+    } catch (e) {
+      console.warn('Error analizando documento en portada:', e);
+    } finally {
+      setAnalizando(false);
+      window.location.hash = destinoApp;
+    }
+  };
 
   // Pausa las animaciones del fondo cuando el hero sale de pantalla (ahorra batería).
   const heroRef = useRef(null);
@@ -76,46 +96,14 @@ export default function Portada({ sesion }) {
     return () => observador.disconnect();
   }, []);
 
-  const irAPlataforma = (e) => {
-    e.preventDefault();
-    window.location.hash = destinoApp;
-  };
-
-  const subirDocumentoPortada = async (file) => {
-    if (!file) return;
-    setArchivo(file.name);
-    setAnalizando(true);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const resp = await fetch('/api/analizar-documento', {
-        method: 'POST',
-        body: formData
-      });
-      if (resp.ok) {
-        const json = await resp.json();
-        if (json.datos) {
-          sessionStorage.setItem('atlas_datos_ia_precargados', JSON.stringify(json.datos));
-        }
-      }
-    } catch (e) {
-      console.warn('Error analizando documento en portada:', e);
-    } finally {
-      setAnalizando(false);
-      window.location.hash = destinoApp;
-    }
-  };
-
   return (
     <>
       <header className="portada-nav">
         <div className="portada-nav__interior">
           <AtlasLogo height={32} />
-          <nav className="portada-nav__enlaces" aria-label="Principal">
-            <a href="#como-funciona">Cómo funciona</a>
-            <Boton variante="destacado" href={destinoApp}>
-              {sesion ? 'Ir a la plataforma' : 'Entrar a la plataforma'}
+          <nav aria-label="Principal">
+            <Boton variante="contorno" href={destinoApp}>
+              {sesion ? 'Ir a la plataforma' : 'Ingresar'}
             </Boton>
           </nav>
         </div>
@@ -125,6 +113,7 @@ export default function Portada({ sesion }) {
         <section ref={heroRef} className={visible ? 'hero' : 'hero hero--pausado'}>
           <svg className="hero__fondo" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             {GRUPOS.map((g, i) => (
+              // El <g> exterior lo anima el CSS; el interior lo posiciona (un transform CSS pisaría el atributo).
               <g key={i} className={`hero__grupo hero__grupo--${i + 1}`}>
                 <g transform={`translate(${g.x} ${g.y})`}>
                   <g fill="none" stroke="#fff" strokeWidth="1" opacity="0.055">
@@ -141,15 +130,12 @@ export default function Portada({ sesion }) {
 
           <div className="hero__interior">
             <div className="hero__contenido">
-              <span className="hero__chip">Expo Clean Ecuador 2026 · Reto 2</span>
               <h1>
                 Una cotización de limpieza <span className="hero__resaltado">clara, completa y a la medida</span> de cada lugar.
               </h1>
-              <p className="hero__texto">
-                Atlas analiza pliegos técnicos con Inteligencia Artificial, estructura los costos unitarios según tipología y riesgo sanitario, y guarda el levantamiento directamente en Excel local.
-              </p>
+              <p className="hero__texto">Atlas te guía paso a paso, calcula todos los costos y deja la propuesta lista en minutos, sin hojas de cálculo.</p>
               <div className="hero__acciones">
-                <Boton variante="destacado" href={destinoApp}>
+                <Boton variante="destacado" href="#cotizar">
                   Empezar una cotización
                 </Boton>
                 <Boton variante="contorno" href="#como-funciona">
@@ -167,8 +153,15 @@ export default function Portada({ sesion }) {
                 ))}
               </ul>
             </div>
+          </div>
+        </section>
 
-            <div className="intake">
+        <section id="cotizar" className="seccion">
+          <div className="seccion__cab">
+            <p className="antetitulo">Cotizar</p>
+            <h2>Cuéntanos sobre el lugar</h2>
+          </div>
+          <div className="intake">
               <Pestanas etiqueta="Cómo empezar" opciones={MODOS} valor={modo} alCambiar={setModo} />
 
               {modo === 'formulario' ? (
@@ -177,55 +170,29 @@ export default function Portada({ sesion }) {
                     <h2>Describe el lugar</h2>
                     <p className="texto-suave">Con estos datos empieza la cotización.</p>
                   </div>
-                  <Campo etiqueta="Empresa o entidad">
-                    {(id) => (
-                      <input
-                        id={id}
-                        className="entrada"
-                        name="cliente"
-                        value={cliente}
-                        onChange={(e) => setCliente(e.target.value)}
-                        placeholder="Ej. Hospital Metropolitano / Mall El Recreo"
-                        required
-                      />
-                    )}
-                  </Campo>
+                  <Campo etiqueta="Empresa o entidad">{(id) => <input id={id} className="entrada" name="cliente" required />}</Campo>
                   <div className="intake__fila">
                     <Campo etiqueta="Tipo de sitio">
                       {(id) => (
-                        <select
-                          id={id}
-                          className="entrada"
-                          name="tipo"
-                          value={tipo}
-                          onChange={(e) => setTipo(e.target.value)}
-                        >
-                          <option value="">Elige un tipo de sitio...</option>
+                        <select id={id} className="entrada" name="tipo">
                           {TIPOS_SITIO.map((t) => (
-                            <option key={t} value={t}>{t}</option>
+                            <option key={t}>{t}</option>
                           ))}
                         </select>
                       )}
                     </Campo>
                     <Campo etiqueta="Turnos">
                       {(id) => (
-                        <select
-                          id={id}
-                          className="entrada"
-                          name="turno"
-                          value={turno}
-                          onChange={(e) => setTurno(e.target.value)}
-                        >
-                          <option value="">Elige los turnos...</option>
+                        <select id={id} className="entrada" name="turno">
                           {TURNOS.map((t) => (
-                            <option key={t} value={t}>{t}</option>
+                            <option key={t}>{t}</option>
                           ))}
                         </select>
                       )}
                     </Campo>
                   </div>
                   <Boton variante="primario" type="submit">
-                    Continuar a la plataforma
+                    Continuar
                   </Boton>
                 </form>
               ) : (
@@ -235,39 +202,15 @@ export default function Portada({ sesion }) {
                     <p className="texto-suave">PDF, Word o TXT. La IA extraerá metraje, riesgo y personal sugerido.</p>
                   </div>
                   <label className="subida">
-                    <input
-                      type="file"
-                      className="visualmente-oculto"
-                      accept=".pdf,.doc,.docx,.txt"
-                      onChange={(e) => subirDocumentoPortada(e.target.files[0])}
-                    />
+                    <input type="file" className="visualmente-oculto" accept=".pdf,.doc,.docx,.txt" onChange={(e) => subirDocumento(e.target.files[0])} />
                     <strong>{archivo ?? 'Elige un pliego o TDR (PDF/Word)'}</strong>
-                    <span className="texto-suave">
-                      {analizando ? 'Analizando pliego con IA...' : 'Haz clic o arrastra para procesar con IA'}
-                    </span>
-                  </label>
-                  <Insignia tono="ok">✦ Asistente IA activo: extracción instantánea</Insignia>
-                </div>
+                    <span className="texto-suave">{analizando ? 'Analizando pliego…' : 'Haz clic para seleccionarlo'}</span>
+                  </label>                </div>
               )}
-            </div>
           </div>
         </section>
 
-        <section id="como-funciona" className="pasos-seccion">
-          <div className="pasos-seccion__cab">
-            <p className="antetitulo">Cómo funciona</p>
-            <h2>Seis pasos, de los requisitos a la propuesta en Excel</h2>
-          </div>
-          <ol className="pasos-rejilla">
-            {PASOS.map((p, i) => (
-              <li key={p.id} className="panel">
-                <span className="paso-num">{i + 1}</span>
-                <h3>{p.nombre}</h3>
-                <p className="texto-suave">{p.descripcion}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <ComoFunciona />
       </main>
 
       <footer className="portada-pie">Expo Clean Ecuador 2026</footer>
