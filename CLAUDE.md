@@ -16,6 +16,14 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 - `src/pasos.js`: los 6 pasos (Requisitos, Personal, Insumos, Equipos, Costos, Propuesta).
 - `src/App.jsx`: rutas por hash: `#/` portada, `#/app/<paso>` plataforma.
 
+## Esquema visual y distribución (fijo)
+El aspecto y la distribución actuales son la norma para todo el proyecto. No se cambian sin aprobación explícita.
+- Paleta, tipografía, espacios, radios y sombras: solo los tokens de `src/index.css`.
+- Portada: barra de navegación marino arriba, hero marino con el texto a la izquierda y la tarjeta de intake a la derecha, y debajo la sección de pasos sobre fondo crema.
+- Plataforma: barra lateral marino a la izquierda (256px) con los pasos, barra superior blanca con antetítulo y título, y debajo el contenido sobre fondo crema: fila de tarjetas KPI y luego paneles blancos.
+- Toda pantalla o paso nuevo se monta dentro de esta distribución, con los componentes de `src/components/ui.jsx`, sin inventar diseños nuevos.
+- En móvil se mantiene el mismo comportamiento: una sola columna y la barra lateral convertida en una fila de pasos desplazable.
+
 ## Reglas
 - Las pantallas usan los tokens y componentes de `src/index.css` y `src/components/ui.jsx`; nada de colores o tamaños sueltos. Si falta algo, se agrega ahí.
 - Sin dependencias por CDN: la app debe funcionar sin internet (la fuente va por `@fontsource-variable`).
