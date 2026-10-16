@@ -10,25 +10,32 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 
 ## Estructura
 - `src/index.css`: tokens (colores, tipografía, espacios, radios, sombras) y estilos de los componentes.
-- `src/components/ui.jsx`: componentes compartidos (`Marca`, `Boton`, `Insignia`, `TarjetaKpi`, `Campo`, `Tabla`, `Pestanas`).
-- `src/App.css`: diseño de las pantallas.
-- `src/pantallas/`: `Portada` (landing + intake) y `Plataforma` (barra lateral + 6 pasos).
-- `src/pasos.js`: los 6 pasos (Requisitos, Personal, Insumos, Equipos, Costos, Propuesta).
-- `src/App.jsx`: rutas por hash: `#/` portada, `#/app/<paso>` plataforma.
+- `src/components/ui.jsx`: componentes compartidos (`AtlasLogo`, `Boton`, `Insignia`, `Campo`, `Pestanas`).
+- `src/App.css`: diseño de la landing.
+- `src/pantallas/Portada.jsx`: la landing (encabezado, hero, sección del formulario, cómo funciona y pie).
+- `src/pantallas/ComoFunciona.jsx`: la sección "Cómo funciona" (maestro-detalle / acordeón).
+- `src/pasos.js`: contenido de los 6 pasos (título, subtítulo, descripción y viñetas).
+
+## Alcance actual
+Solo la landing page. No hay plataforma ni flujo después de ingresar: "Ingresar" y "Empezar una cotización" bajan a la tarjeta del formulario (`#cotizar`), y "Continuar" solo valida.
 
 ## Esquema visual y distribución (fijo)
 El aspecto y la distribución actuales son la norma para todo el proyecto. No se cambian sin aprobación explícita.
 - Paleta, tipografía, espacios, radios y sombras: solo los tokens de `src/index.css`.
-- Portada: barra de navegación marino arriba, hero marino con el texto a la izquierda y la tarjeta de intake a la derecha, y debajo la sección de pasos sobre fondo crema.
-- Plataforma: barra lateral marino a la izquierda (256px) con los pasos, barra superior blanca con antetítulo y título, y debajo el contenido sobre fondo crema: fila de tarjetas KPI y luego paneles blancos.
-- Toda pantalla o paso nuevo se monta dentro de esta distribución, con los componentes de `src/components/ui.jsx`, sin inventar diseños nuevos.
-- En móvil se mantiene el mismo comportamiento: una sola columna y la barra lateral convertida en una fila de pasos desplazable.
+- Landing, de arriba abajo:
+  - barra de navegación marino con un solo botón ("Ingresar");
+  - hero marino centrado: titular de tres líneas (la central en cian), subtítulo, botones y una franja de 3 beneficios con iconos; fondo decorativo de curvas de nivel y pines (limpio detrás del texto); sus últimos 80px se funden con el crema;
+  - sección "Cotizar" con la tarjeta del formulario centrada sobre fondo crema;
+  - bloque azul (los primeros 80px funden el crema con el marino) con la sección "Cómo funciona": maestro-detalle con el panel del paso activo a la izquierda y la lista de 6 pasos a la derecha (pestañas accesibles, avance automático cada 6 s); por debajo de 900px es un acordeón;
+  - pie dentro del bloque azul, con texto pequeño.
+- El botón "Empezar una cotización" del hero no se toca: ni texto, ni color, ni tamaño, ni posición.
+- Toda sección nueva usa los componentes de `src/components/ui.jsx`, sin inventar diseños nuevos.
+- En móvil se mantiene el mismo orden en una sola columna.
 
 ## Reglas
 - Las pantallas usan los tokens y componentes de `src/index.css` y `src/components/ui.jsx`; nada de colores o tamaños sueltos. Si falta algo, se agrega ahí.
 - Sin dependencias por CDN: la app debe funcionar sin internet (la fuente va por `@fontsource-variable`).
-- Nada de cifras fijas en pantalla (KPIs, porcentajes): se calculan o se rotulan como ejemplo. Sin valor, `TarjetaKpi` muestra "—".
-- Parámetros de negocio (SBU, IESS, IVA, márgenes, recargos) en configuración, no en el código.
+- Nada de cifras fijas en pantalla (KPIs, porcentajes): se calculan o se rotulan como ejemplo.- Parámetros de negocio (SBU, IESS, IVA, márgenes, recargos) en configuración, no en el código.
 
 ## Referencias (no son código para copiar)
 - Prototipo visual: `C:\Users\flavi\Downloads\gemini-code-1792180880801.html`. Solo aspecto; no sus datos, cifras ni lógica.
