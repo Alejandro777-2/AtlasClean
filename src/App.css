@@ -2,7 +2,24 @@
 
 /* ── Portada ── */
 .portada-nav { position: sticky; top: 0; z-index: 10; background: var(--marino); color: #fff; border-bottom: 1px solid var(--marino-linea); }
-.portada-nav__interior { max-width: 1200px; height: 72px; margin: 0 auto; padding: 0 var(--e4); display: flex; align-items: center; justify-content: space-between; gap: var(--e4); }
+.portada-nav__interior { max-width: 1200px; height: var(--alto-nav); margin: 0 auto; padding: 0 var(--e4); display: flex; align-items: center; justify-content: space-between; gap: var(--e4); }
+:root { --alto-nav: 72px; }
+
+/* Landing: nav fijo y transparente sobre el hero. Al pasar 40px aparece una capa marino con
+   sombra (se anima su opacidad, no el color). El login usa .portada-nav sin el modificador. */
+.portada-nav--flotante { position: fixed; top: 0; left: 0; right: 0; background: transparent; border-bottom-color: transparent; }
+.portada-nav--flotante::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: var(--marino); box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
+  opacity: 0; transition: opacity 200ms ease;
+}
+.portada-nav--solido::before { opacity: 1; }
+/* Barra de progreso de scroll (2px, cian) en el borde inferior del nav. */
+.portada-nav__progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--cian); transform: scaleX(0); transform-origin: left; pointer-events: none; }
+@supports (animation-timeline: scroll()) {
+  .portada-nav__progreso { animation: progreso-pagina linear both; animation-timeline: scroll(root); }
+}
+@keyframes progreso-pagina { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
 /* Divisores ondulados entre secciones (componente Ola). Alto fijo y ancho al 100 %; se solapan 1px
    con la sección vecina para que no quede ninguna línea fina entre ambas. */
@@ -20,7 +37,8 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 /* El hero termina en una ola rellena de crema, el fondo de la sección siguiente. */
 .hero {
   position: relative; overflow: hidden;
-  padding: 48px 0 calc(var(--ola) + 40px); color: #fff;
+  /* padding-top incluye el alto del nav, que es fijo y va encima del hero. */
+  padding: calc(var(--alto-nav) + 48px) 0 calc(var(--ola) + 40px); color: #fff;
   background:
     radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--cian) 18%, transparent), transparent 45%),
     radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--azul) 20%, transparent), transparent 50%),
@@ -188,14 +206,14 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 .pliego__privacidad svg { flex: none; }
 
 /* Secciones bajo el hero (cotizar, cómo funciona). scroll-margin: que el encabezado fijo no las tape. */
-.seccion { max-width: 1200px; margin: 0 auto; padding: 64px var(--e4); scroll-margin-top: 72px; }
+.seccion { max-width: 1200px; margin: 0 auto; padding: 64px var(--e4); scroll-margin-top: calc(var(--alto-nav) + 16px); }
 .seccion__cab { max-width: 60ch; margin: 0 auto var(--e6); text-align: center; }
 .seccion__cab h2 { margin-top: var(--e1); font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.01em; }
 
 /* ── Cómo funciona: bloque azul (con el footer). Empieza con una ola rellena de crema: la curva se
    dibuja sobre el propio bloque para que sus degradados radiales no dejen costura en la unión. ── */
 .como {
-  position: relative; scroll-margin-top: 72px; padding-top: var(--ola); color: #fff;
+  position: relative; scroll-margin-top: calc(var(--alto-nav) + 16px); padding-top: var(--ola); color: #fff;
   background:
     radial-gradient(circle at 85% 25%, color-mix(in srgb, var(--cian) 12%, transparent), transparent 45%),
     radial-gradient(circle at 10% 70%, color-mix(in srgb, var(--azul) 18%, transparent), transparent 50%),
@@ -320,7 +338,7 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 }
 @media (max-width: 600px) {
   :root { --ola: 40px; }
-  .hero { padding: var(--e6) 0 calc(var(--ola) + 40px); }
+  .hero { padding: calc(var(--alto-nav) + var(--e6)) 0 calc(var(--ola) + 40px); }
   .hero h1 { font-size: var(--t-2xl); }
   .intake { padding: var(--e5) var(--e4); }
   .modos { grid-template-columns: 1fr; }

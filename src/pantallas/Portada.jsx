@@ -162,9 +162,38 @@ export default function Portada({ sesion }) {
     return () => observador.disconnect();
   }, []);
 
+  // Nav: transparente sobre el hero y sólido pasados 40px. La barra de progreso usa
+  // animation-timeline: scroll() si el navegador lo soporta; si no, se actualiza aquí con rAF.
+  const [navSolido, setNavSolido] = useState(false);
+  const barraRef = useRef(null);
+  useEffect(() => {
+    const conTimeline = CSS.supports('animation-timeline: scroll()');
+    let raf = 0;
+    const actualizar = () => {
+      raf = 0;
+      setNavSolido(window.scrollY > 40);
+      if (!conTimeline && barraRef.current) {
+        const recorrido = document.documentElement.scrollHeight - window.innerHeight;
+        barraRef.current.style.transform = `scaleX(${recorrido > 0 ? Math.min(1, window.scrollY / recorrido) : 0})`;
+      }
+    };
+    const alMover = () => {
+      if (!raf) raf = requestAnimationFrame(actualizar);
+    };
+    actualizar();
+    window.addEventListener('scroll', alMover, { passive: true });
+    window.addEventListener('resize', alMover);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', alMover);
+      window.removeEventListener('resize', alMover);
+    };
+  }, []);
+
   return (
     <>
-      <header className="portada-nav">
+      <header className={navSolido ? 'portada-nav portada-nav--flotante portada-nav--solido' : 'portada-nav portada-nav--flotante'}>
+        <span ref={barraRef} className="portada-nav__progreso" aria-hidden="true" />
         <div className="portada-nav__interior">
           <AtlasLogo height={32} />
           <nav aria-label="Principal">
