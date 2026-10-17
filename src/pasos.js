@@ -62,7 +62,7 @@ export const REGISTRO = {
 export const SECCIONES_CLIENTE = [VISITA, REGISTRO];
 
 // Los 6 pasos tal como los ve el CLIENTE en su espacio (#/cliente/<paso>): qué incluye cada parte de su servicio,
-// sin costos internos ni márgenes. El cálculo real lo hace el equipo después de la visita.
+// sin precios, costos internos ni márgenes: la cotización la hace el equipo después de la visita técnica.
 export const PASOS_CLIENTE = [
   {
     id: 'requisitos',
@@ -89,14 +89,9 @@ export const PASOS_CLIENTE = [
     incluye: ['Maquinaria según el tamaño y el tipo de piso', 'Protección del personal (EPP)', 'Mantenimiento de los equipos a nuestro cargo']
   },
   {
-    id: 'costos',
-    nombre: 'Cotización previa',
-    descripcion: 'Un rango orientativo del costo mensual y cómo contactarnos. La cotización final se hace tras la visita.'
-  },
-  {
     id: 'propuesta',
     nombre: 'Propuesta',
-    descripcion: 'En qué etapa está tu solicitud y qué sigue hasta recibir la propuesta formal.'
+    descripcion: 'En qué etapa está tu solicitud y qué sigue hasta recibir la propuesta formal, con su precio.'
   }
 ];
 
@@ -105,5 +100,5 @@ export const PASOS_CLIENTE = [
 export const RECORRIDO_CLIENTE = [
   { id: 'inicio', etiqueta: { formulario: 'Datos del lugar', documento: 'Tu pliego' } },
   { id: 'formulario', etiqueta: 'Tu formulario' },
-  { id: 'cotizacion', etiqueta: 'Cotización previa' }
+  { id: 'visita', etiqueta: 'Visita técnica' }
 ];

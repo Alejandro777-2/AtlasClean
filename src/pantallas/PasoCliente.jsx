@@ -1,15 +1,15 @@
 /**
  * Los 6 pasos de la cotización tal como los ve el CLIENTE en su espacio (#/cliente/<paso>).
  * Solo lo que le sirve a él: qué incluye su servicio, lo que ya sabemos de su lugar y lo que pide su pliego.
- * Nunca muestra costos internos, sueldos, márgenes ni el motor de costos: eso queda en la plataforma del equipo.
+ * Nunca muestra precios ni presupuestos, ni costos internos o márgenes: el precio llega en la propuesta formal,
+ * después de la visita técnica, para no dar al cliente una cifra que luego cambie.
  */
 import { Aviso, Boton, Insignia, Tabla } from '../components/ui.jsx';
 import { useSolicitud } from '../estado/contexto.js';
 import { ETIQUETAS } from '../config/opciones.js';
 import { rutaModulo } from '../estado/rutas.js';
-import { estimarPresupuesto } from '../presupuesto/estimar.js';
 import PasoRequisitos from './PasoRequisitos.jsx';
-import PasoCostos, { Contactanos } from './PasoCostos.jsx';
+import { Contactanos } from './Contactanos.jsx';
 import { RequisitosModulo } from './RequisitosPliego.jsx';
 
 /** Lo que la ficha ya dice de este paso, en palabras para el cliente (sin cifras de costo). */
@@ -88,7 +88,7 @@ function PasoIncluye({ paso }) {
       <RequisitosModulo modulo={paso.id} paraCliente />
 
       <Aviso tono="info" titulo="Lo confirmamos en la visita técnica">
-        Las cantidades exactas se definen con las medidas reales de tu lugar. El costo de esta parte ya está considerado en tu cotización previa.
+        Las cantidades exactas se definen con las medidas reales de tu lugar. El precio llega en la propuesta formal, después de la visita.
       </Aviso>
     </div>
   );
@@ -96,8 +96,7 @@ function PasoIncluye({ paso }) {
 
 /** Paso 6: en qué etapa está la solicitud y qué sigue. */
 function EstadoSolicitud() {
-  const { ficha, formulario } = useSolicitud();
-  const presupuesto = estimarPresupuesto(ficha, formulario);
+  const { ficha } = useSolicitud();
   const etapas = [
     {
       id: 'solicitud',
@@ -111,15 +110,9 @@ function EstadoSolicitud() {
       estado: !ficha ? <Insignia>Pendiente</Insignia> : ficha.listoParaVisita ? <Insignia tono="ok">Lista</Insignia> : <Insignia tono="aviso">Faltan datos</Insignia>,
       detalle: ficha?.listoParaVisita ? 'Ya podemos agendar la visita.' : 'Necesitamos el tipo de lugar, la dirección y un contacto.'
     },
-    {
-      id: 'previa',
-      etapa: 'Cotización previa',
-      estado: presupuesto.disponible ? <Insignia tono="ok">Disponible</Insignia> : <Insignia>Pendiente</Insignia>,
-      detalle: 'Un rango orientativo del costo mensual.'
-    },
     { id: 'visita', etapa: 'Visita técnica', estado: <Insignia>Por agendar</Insignia>, detalle: 'Un técnico mide cada zona y confirma horarios y requisitos.' },
-    { id: 'final', etapa: 'Cotización final', estado: <Insignia>Después de la visita</Insignia>, detalle: 'El valor exacto, con las medidas reales.' },
-    { id: 'propuesta', etapa: 'Propuesta formal', estado: <Insignia>Después de la visita</Insignia>, detalle: 'Te la enviamos para tu aprobación.' }
+    { id: 'final', etapa: 'Cotización', estado: <Insignia>Después de la visita</Insignia>, detalle: 'El precio se calcula con las medidas reales de tu lugar.' },
+    { id: 'propuesta', etapa: 'Propuesta formal', estado: <Insignia>Después de la visita</Insignia>, detalle: 'Te la enviamos con el precio, para tu aprobación.' }
   ];
 
   return (
@@ -139,7 +132,6 @@ function EstadoSolicitud() {
 
 export default function PasoCliente({ paso }) {
   if (paso.id === 'requisitos') return <PasoRequisitos paraCliente />;
-  if (paso.id === 'costos') return <PasoCostos paraCliente />;
   if (paso.id === 'propuesta') return <EstadoSolicitud />;
   return <PasoIncluye paso={paso} />;
 }

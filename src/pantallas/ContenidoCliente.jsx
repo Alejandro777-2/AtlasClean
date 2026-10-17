@@ -1,8 +1,8 @@
 /**
  * MÓDULO DEL CLIENTE dentro de la plataforma.
  * - ContenidoCliente: lo que se muestra en #/app/visita (Asistente de visita) y #/app/registro (registro del formulario).
- * - AportesFicha: lo que la ficha de visita aporta a cada paso del cotizador (zonas sugeridas, requisitos del pliego,
- *   presupuesto previo y «Contáctanos»). Solo aparece si hay ficha, salvo «Contáctanos», que está siempre en Costos.
+ * - AportesFicha: lo que la ficha de visita aporta a cada paso del cotizador (zonas sugeridas y requisitos del pliego).
+ *   Solo aparece si hay ficha. No hay presupuesto previo: el precio lo calcula el motor de costos tras la visita.
  * Se separa de Plataforma.jsx para no mezclar la lógica del cotizador con la del cliente.
  */
 import { Insignia, TarjetaKpi } from '../components/ui.jsx';
@@ -14,7 +14,6 @@ import { requisitoDe } from '../formulario/fichaUtil.js';
 import AsistenteVisita from './AsistenteVisita.jsx';
 import RegistroFormulario from './RegistroFormulario.jsx';
 import PasoRequisitos from './PasoRequisitos.jsx';
-import PasoCostos from './PasoCostos.jsx';
 import { RequisitosModulo } from './RequisitosPliego.jsx';
 
 export function EstadoFicha() {
@@ -86,15 +85,6 @@ export default function ContenidoCliente({ seccion }) {
 export function AportesFicha({ pasoId }) {
   const { ficha } = useSolicitud();
 
-  if (pasoId === 'costos') {
-    return (
-      <section className="panel aportes-ficha">
-        <h2>Presupuesto previo para el cliente</h2>
-        <p className="panel__desc">Rango orientativo calculado con la ficha de visita. No reemplaza la cotización del motor de costos.</p>
-        <PasoCostos />
-      </section>
-    );
-  }
   if (!ficha) return null;
   if (pasoId === 'requisitos') {
     return (

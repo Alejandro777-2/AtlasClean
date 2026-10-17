@@ -10,7 +10,6 @@ import { TablaRequisitosPliego } from './RequisitosPliego.jsx';
 import { m2Zona, requisitoDe } from '../formulario/fichaUtil.js';
 import { CAMPOS_DESDE_DOCUMENTO, valorLegible } from '../formulario/desdeDocumento.js';
 import { REGISTRO } from '../pasos.js';
-import { estimarPresupuesto, textoRango } from '../presupuesto/estimar.js';
 import { MODULOS_COTIZACION } from '../config/opciones.js';
 import { rutaModulo } from '../estado/rutas.js';
 
@@ -69,7 +68,6 @@ export default function FichaVisita() {
   const { ficha, meta, verificados, alternarVerificado, setVista, generarFicha, estado, error, formulario, desdeDocumento, puedeDeshacerDocumento, deshacerDesdeDocumento } = useSolicitud();
   const [copiado, setCopiado] = useState(false);
   const generando = estado === 'generando';
-  const presupuesto = estimarPresupuesto(ficha, formulario);
   if (!ficha) return null;
   const c = ficha.configuracionInicial;
 
@@ -180,16 +178,7 @@ export default function FichaVisita() {
       <section className="ficha__seccion">
         <h3>Resumen</h3>
         <p className="ficha__resumen">{ficha.resumen}</p>
-        <p className="texto-suave ficha__estimacion">
-          {presupuesto.disponible ? (
-            <>
-              Presupuesto previo (orientativo): <strong>{textoRango(presupuesto.mensual)}</strong> mensuales + IVA ·{' '}
-              <a href={rutaModulo('costos')}>ver el detalle</a>
-            </>
-          ) : (
-            <>Estimación previa: {ficha.estimacionPrevia}</>
-          )}
-        </p>
+        <p className="texto-suave ficha__estimacion">El precio se calcula después de la visita técnica, con las medidas reales.</p>
       </section>
 
       <section className="ficha__seccion">

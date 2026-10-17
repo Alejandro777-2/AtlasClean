@@ -3,7 +3,7 @@
  * Se entra desde la landing (tarjeta «Cotizar» → «Continuar»).
  * Usa la misma distribución que la plataforma (barra lateral marino + barra superior + contenido),
  * pero solo con lo que el cliente necesita: su solicitud (formulario y ficha con IA), el registro de sus datos
- * y los 6 pasos de su cotización en versión para el cliente (sin costos internos ni márgenes).
+ * y los pasos de su cotización en versión para el cliente (sin precios, costos internos ni márgenes).
  * El cotizador completo queda en la plataforma del equipo (#/app, con login).
  */
 import { useEffect } from 'react';
@@ -19,8 +19,8 @@ const SECCIONES_SOLICITUD = [
   { id: 'registro', nombre: 'Registro de tus datos', icono: '≡', descripcion: 'Todos los datos que nos diste, con su estado. Se actualiza solo al editar el formulario.' }
 ];
 
-// Enlaces antiguos: #/cliente/presupuesto es ahora el paso «Cotización previa» (costos).
-const ALIAS = { presupuesto: 'costos' };
+// Enlaces antiguos: el presupuesto previo se quitó (el precio llega en la propuesta, tras la visita).
+const ALIAS = { presupuesto: 'propuesta', costos: 'propuesta' };
 
 export default function EspacioCliente({ seccion }) {
   const id = ALIAS[seccion] ?? seccion;
@@ -29,7 +29,7 @@ export default function EspacioCliente({ seccion }) {
   const actual = paso ?? SECCIONES_SOLICITUD.find((s) => s.id === id) ?? SECCIONES_SOLICITUD[0];
   const { vista, ficha, documento } = useSolicitud();
 
-  // Recorrido: paso 2 («Tu formulario») mientras llena su solicitud; paso 3 («Cotización previa») cuando ya
+  // Recorrido: paso 2 («Tu formulario») mientras llena su solicitud; paso 3 («Visita técnica») cuando ya
   // envió los datos y tiene la ficha con las recomendaciones (y en los pasos de la cotización).
   const enFormulario = actual.id === 'visita' ? vista !== 'ficha' : !ficha;
   const pasoRecorrido = ficha && !enFormulario ? 2 : 1;

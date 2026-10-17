@@ -605,7 +605,7 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--e3); }
 .leyenda-riesgo { display: flex; flex-wrap: wrap; gap: var(--e2); margin-bottom: var(--e4); }
 
-/* ═══ Módulo del cliente: Asistente de visita, ficha, registro y presupuesto previo ═══ */
+/* ═══ Módulo del cliente: Asistente de visita, ficha, registro y contacto ═══ */
 /* ── Formulario del cliente ── */
 .formulario { display: grid; gap: var(--e5); }
 .formulario__cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); }
@@ -685,29 +685,11 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
   .panel { border: 0; box-shadow: none; padding: 0; }
   .ficha__chequeo label, .ficha__lista--avisos li { break-inside: avoid; }
   .solo-pantalla { display: none !important; }
-  .solo-impresion, .presupuesto__membrete { display: flex !important; flex-direction: column; gap: 2px; margin-bottom: var(--e4); }
-  .presupuesto .presupuesto__resumen { background: #fff; color: var(--texto); border: 2px solid var(--marino); }
-  .presupuesto .presupuesto__resumen .antetitulo, .presupuesto .presupuesto__unidad, .presupuesto .presupuesto__extra dt { color: var(--texto-suave); }
-  .contacto, .presupuesto .tabla tr { break-inside: avoid; }
-  .panel:has(.presupuesto) > h2, .panel:has(.presupuesto) > .panel__desc { display: none; }
-  /* Al imprimir el presupuesto para el cliente, se oculta todo lo demás del paso (motor de costos interno, etc.). */
-  body.imprimiendo-presupuesto .contenido > :not(.aportes-ficha) { display: none !important; }
-  body.imprimiendo-presupuesto .aportes-ficha { border: 0; box-shadow: none; padding: 0; }
+  .solo-impresion { display: flex !important; flex-direction: column; gap: 2px; margin-bottom: var(--e4); }
+  .contacto { break-inside: avoid; }
 }
 
-/* ── Presupuesto previo y contacto (paso Costos) ── */
-.presupuesto__resumen {
-  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--e5);
-  padding: var(--e5); border-radius: var(--radio-lg); background: var(--marino); color: #fff;
-}
-.presupuesto__resumen .antetitulo { color: var(--cian); margin: 0; }
-.presupuesto__cifra { margin: var(--e2) 0 0; font-size: var(--t-2xl); font-weight: 800; font-variant-numeric: tabular-nums; }
-.presupuesto__unidad { margin: 0; color: var(--texto-sobre-marino); font-size: var(--t-md); }
-.presupuesto__extra { display: grid; gap: var(--e3); margin: 0; }
-.presupuesto__extra dt { font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-sobre-marino-suave); }
-.presupuesto__extra dd { margin: 2px 0 0; font-weight: 700; font-variant-numeric: tabular-nums; }
-.presupuesto__acciones { display: flex; flex-wrap: wrap; gap: var(--e2); }
-.presupuesto__membrete { display: none; }
+/* ── «Contáctanos» (paso Propuesta del cliente) ── */
 .contacto { display: grid; gap: var(--e4); padding: var(--e5); border: 1px solid var(--linea); border-radius: var(--radio-lg); background: var(--superficie-2); }
 .contacto__cabecera { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--e3); }
 .contacto__cabecera h3 { margin: var(--e1) 0; }

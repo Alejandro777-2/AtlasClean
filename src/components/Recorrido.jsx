@@ -1,6 +1,6 @@
 /**
  * Barra del recorrido del cliente (3 pasos con nombre). La usan la tarjeta «Cotizar» de la landing (paso 1)
- * y el espacio del cliente (paso 2 en el formulario, paso 3 al tener la ficha y la cotización previa).
+ * y el espacio del cliente (paso 2 en el formulario, paso 3 «Visita técnica» al tener la ficha).
  * Pasos hechos en verde con ✓, el actual en cian (su línea se llena al llegar) y los siguientes en gris.
  */
 import { RECORRIDO_CLIENTE } from '../pasos.js';

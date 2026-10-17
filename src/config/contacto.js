@@ -1,4 +1,4 @@
-// DATOS DE CONTACTO DE ATLAS (se muestran al cliente en Costos y en el presupuesto impreso).
+// DATOS DE CONTACTO DE ATLAS (se muestran al cliente en «Contáctanos», paso Propuesta de su espacio).
 // ⚠ Son datos de EJEMPLO: reemplázalos por los reales y cambia `esEjemplo` a false.
 // Deja `url` vacío en una red social si aún no existe: se mostrará el texto sin enlace.
 

@@ -13,7 +13,7 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 - `src/index.css`: tokens (colores, tipografía, espacios, radios, sombras) y estilos de los componentes.
 - `src/components/ui.jsx`: componentes compartidos (`AtlasLogo`, `Boton`, `Insignia`, `TarjetaKpi`, `Campo`, `Opciones`, `Tabla`, `Aviso`, `Pestanas`).
 - `src/App.css`: diseño de la landing, de la plataforma y del módulo del cliente.
-- `src/App.jsx`: rutas por hash: `#/` landing, `#/login`, `#/app/<paso>` plataforma del equipo (requiere sesión; incluye `#/app/visita` y `#/app/registro`) y `#/cliente/<sección>` espacio del cliente sin login (`visita`, `registro` y los 6 pasos en versión cliente; `presupuesto` es alias de `costos`). Envuelve todo en `ErrorPantalla` y `ProveedorSolicitud`.
+- `src/App.jsx`: rutas por hash: `#/` landing, `#/login`, `#/app/<paso>` plataforma del equipo (requiere sesión; incluye `#/app/visita` y `#/app/registro`) y `#/cliente/<sección>` espacio del cliente sin login (`visita`, `registro` y los pasos en versión cliente; `presupuesto` y `costos` llevan a `propuesta`). Envuelve todo en `ErrorPantalla` y `ProveedorSolicitud`.
 - `src/pantallas/Portada.jsx`: la landing (encabezado, hero, sección del formulario, cómo funciona y pie).
 - `src/pantallas/ComoFunciona.jsx`: la sección "Cómo funciona" (maestro-detalle / acordeón).
 - `src/pantallas/Login.jsx`: acceso a la plataforma (credenciales demo).
@@ -23,14 +23,15 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 - `src/pantallas/Planes.jsx` + `src/planes.js`: sección de planes de la landing. Precios, textos comerciales y destino de los botones solo en `planes.js` (`CONFIG_PLANES`); el precio por mes y el ahorro se calculan ahí. Prueba: `src/planes.test.js` (`npm test`).
 
 ### Módulo del cliente (antes de la visita)
-- Barra del recorrido del cliente (`src/components/Recorrido.jsx`, pasos en `RECORRIDO_CLIENTE` de `src/pasos.js`): datos del lugar o pliego → su formulario → cotización previa. En la tarjeta «Cotizar» marca el paso 1; en el espacio del cliente, el paso 2 mientras llena el formulario y el 3 cuando ya tiene la ficha. Hechos en verde con ✓, el actual en cian (su línea se llena al llegar).
+- Barra del recorrido del cliente (`src/components/Recorrido.jsx`, pasos en `RECORRIDO_CLIENTE` de `src/pasos.js`): datos del lugar o pliego → su formulario → visita técnica. En la tarjeta «Cotizar» marca el paso 1; en el espacio del cliente, el paso 2 mientras llena el formulario y el 3 cuando ya tiene la ficha. Hechos en verde con ✓, el actual en cian (su línea se llena al llegar).
 - Entrada del cliente: en la landing, tarjeta «Cotizar» → «Continuar». Lleva a `#/cliente/visita/formulario` con la empresa, el tipo de sitio y el turno de la tarjeta ya puestos (traducción en `DESDE_LANDING` de `src/config/opciones.js`).
 - Pestaña «Subir pliego con IA» de la tarjeta (`src/pantallas/SubirPliego.jsx`): al elegir o arrastrar el pliego (PDF o TXT, límite en `DOCUMENTO` de `opciones.js`) y pulsar «Continuar», el pliego se adjunta a la solicitud y lleva al mismo formulario; la IA lo lee ahí (`leerPliegoDesdeLanding` en `ProveedorSolicitud`) y llena solo los campos vacíos, sin pisar lo que el cliente escriba mientras tanto. También se envía, sin esperar, al backend de análisis para la plataforma del equipo.
-- `src/pantallas/EspacioCliente.jsx`: espacio del cliente sin login, con la misma distribución que la plataforma: su solicitud, el registro y «Tu cotización paso a paso» (los 6 pasos en versión cliente, `src/pantallas/PasoCliente.jsx`, textos en `PASOS_CLIENTE` de `src/pasos.js`). Nunca muestra costos internos, sueldos ni márgenes: los componentes compartidos reciben `paraCliente`. `src/estado/rutas.js` hace que los enlaces del módulo se queden en el espacio en que está la persona (`#/cliente` o `#/app`).
+- `src/pantallas/EspacioCliente.jsx`: espacio del cliente sin login, con la misma distribución que la plataforma: su solicitud, el registro y «Tu cotización paso a paso» (Requisitos, Personal, Insumos, Equipos y Propuesta en versión cliente, `src/pantallas/PasoCliente.jsx`, textos en `PASOS_CLIENTE` de `src/pasos.js`). Nunca muestra costos internos, sueldos ni márgenes: los componentes compartidos reciben `paraCliente`. `src/estado/rutas.js` hace que los enlaces del módulo se queden en el espacio en que está la persona (`#/cliente` o `#/app`).
 - `src/pantallas/ContenidoCliente.jsx`: lo que la plataforma muestra en `#/app/visita` y `#/app/registro` (grupo «Antes de la visita» de la barra lateral).
 - `src/pantallas/AsistenteVisita.jsx`: pestañas `FormularioCliente` y `FichaVisita`.
 - `src/pantallas/RegistroFormulario.jsx` (`#/app/registro`): registro detallado del formulario; se abre en ventana nueva y se sincroniza con la otra ventana por el evento `storage`. Campos en `src/formulario/registro.js`.
-- `src/pantallas/PasoRequisitos.jsx`, `RequisitosPliego.jsx` y `PasoCostos.jsx`: lo que la ficha aporta a los pasos de la cotización (zonas sugeridas, requisitos del pliego, presupuesto previo y «Contáctanos»). Solo aparecen cuando hay ficha de visita.
+- `src/pantallas/PasoRequisitos.jsx` y `RequisitosPliego.jsx`: lo que la ficha aporta a los pasos de la cotización (zonas sugeridas y requisitos del pliego). Solo aparecen cuando hay ficha de visita.
+- `src/pantallas/Contactanos.jsx`: «Contáctanos» en el paso Propuesta del cliente.
 - `src/config/opciones.js`: opciones y etiquetas del formulario del cliente.
 - `src/estado/`: contexto de la solicitud (formulario, documento, ficha; borrador en `localStorage`).
 - `src/formulario/solicitud.js`: validación y conversión del formulario al JSON que recibe el agente.
@@ -51,7 +52,7 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 - `requisitosDelDocumento`: lo que el pliego exige para Personal, Insumos, Equipos, Costos y Propuesta, rotulado «Según el pliego». No son cálculos.
 - `formularioDesdeDocumento`: datos del formulario que la IA encontró en el pliego. Se aplican solo a campos vacíos, con «Deshacer»; el registro los marca «Del documento · pág. X». Reglas en `src/formulario/desdeDocumento.js`.
 - Si la respuesta de la IA se corta por largo, el servidor lo avisa; si deja vacías las secciones del técnico, las completa con las reglas base.
-- Presupuesto previo (en Costos): rango mensual orientativo calculado con la ficha (sin IA) en `src/presupuesto/estimar.js`, parámetros en `src/config/presupuesto.js` (los operativos son de EJEMPLO). Nunca se muestra como cifra exacta ni como cotización; la cotización real es la del motor de costos.
+- SIN PRESUPUESTO PREVIO: al cliente no se le muestra ningún precio, rango ni estimación antes de la visita (si la cotización real saliera de ese rango, generaría inconformidad). El precio llega en la propuesta formal, calculado por el motor de costos con las medidas reales.
 - «Contáctanos»: datos en `src/config/contacto.js`. Son de ejemplo (`esEjemplo: true`) hasta poner los reales.
 - «Lista para agendar» es una regla fija del servidor (tipo de lugar, dirección y contacto), no un criterio de la IA.
 
