@@ -3,6 +3,7 @@ import { AtlasLogo, Boton, Campo, Ola } from '../components/ui.jsx';
 import ComoFunciona from './ComoFunciona.jsx';
 import SubirPliego from './SubirPliego.jsx';
 import Planes from './Planes.jsx';
+import Particulas from '../components/Particulas.jsx';
 
 // Dos formas de empezar la cotización (pestañas con forma de tarjeta).
 const MODOS = [
@@ -257,7 +258,10 @@ export default function Portada({ sesion }) {
           <Ola lado="abajo" color="var(--crema)" colorMedio="var(--ola-medio)" />
         </section>
 
-        <section id="cotizar" className="seccion">
+        {/* Sección a lo ancho (para las partículas) con el contenido en .seccion. */}
+        <section id="cotizar" className="cotizar">
+          <Particulas tema="claro" cantidad={45} cantidadMovil={20} className="particulas-claras" />
+          <div className="seccion">
           <div className="seccion__cab">
             <p className="antetitulo" data-aparecer>
               Cotizar
@@ -365,6 +369,7 @@ export default function Portada({ sesion }) {
                   <SubirPliego destinoApp={destinoApp} />
                 </div>
             </div>
+          </div>
           </div>
         </section>
 
