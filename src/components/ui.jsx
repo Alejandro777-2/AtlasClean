@@ -6,6 +6,23 @@ import { useId } from 'react';
 
 const cx = (...c) => c.filter(Boolean).join(' ');
 
+/**
+ * Divisor ondulado entre secciones (decorativo). Se estira al 100 % del ancho con altura fija
+ * (--ola en App.css). `lado`: 'abajo' rellena la parte inferior (va al pie de una sección),
+ * 'arriba' rellena la superior (va al inicio). `color`: el fondo de la sección vecina.
+ */
+const OLAS = {
+  abajo: 'M0,44 C240,80 480,80 720,50 C960,20 1200,12 1440,40 L1440,80 L0,80 Z',
+  arriba: 'M0,0 L1440,0 L1440,34 C1200,70 960,66 720,36 C480,6 240,4 0,40 Z'
+};
+export function Ola({ lado = 'abajo', color, className }) {
+  return (
+    <svg className={cx('ola', `ola--${lado}`, className)} viewBox="0 0 1440 80" preserveAspectRatio="none" shapeRendering="geometricPrecision" aria-hidden="true" focusable="false">
+      <path d={OLAS[lado]} fill={color} />
+    </svg>
+  );
+}
+
 /** Logotipo de Atlas en SVG (sin dependencias). Letras blancas: pensado para fondo marino. */
 export function AtlasLogo({ height = 44, letters = '#FFFFFF', orb = '#3DC8FF', glow = true, className = 'logo', title = 'Atlas' }) {
   return (

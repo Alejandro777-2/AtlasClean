@@ -1,5 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react';
-import { AtlasLogo, Boton, Campo } from '../components/ui.jsx';
+import { AtlasLogo, Boton, Campo, Ola } from '../components/ui.jsx';
 import ComoFunciona from './ComoFunciona.jsx';
 import SubirPliego from './SubirPliego.jsx';
 
@@ -176,6 +176,7 @@ export default function Portada({ sesion }) {
               </ul>
             </div>
           </div>
+          <Ola lado="abajo" color="var(--crema)" />
         </section>
 
         <section id="cotizar" className="seccion">

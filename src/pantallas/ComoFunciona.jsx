@@ -6,7 +6,7 @@
  * Sin avance en móvil ni con prefers-reduced-motion.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Boton } from '../components/ui.jsx';
+import { Boton, Ola } from '../components/ui.jsx';
 import Particulas from '../components/Particulas.jsx';
 import { PASOS } from '../pasos.js';
 
@@ -101,6 +101,7 @@ export default function ComoFunciona() {
       onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setFocoDentro(false)}
     >
       <Particulas cantidad={movil ? 25 : 55} className="como__particulas" />
+      <Ola lado="arriba" color="var(--crema)" />
 
       <div className="seccion">
         <div className="seccion__cab">

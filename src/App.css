@@ -4,12 +4,18 @@
 .portada-nav { position: sticky; top: 0; z-index: 10; background: var(--marino); color: #fff; border-bottom: 1px solid var(--marino-linea); }
 .portada-nav__interior { max-width: 1200px; height: 72px; margin: 0 auto; padding: 0 var(--e4); display: flex; align-items: center; justify-content: space-between; gap: var(--e4); }
 
-/* Los últimos 80px del hero funden el marino con el crema de la sección siguiente. */
+/* Divisores ondulados entre secciones (componente Ola). Alto fijo y ancho al 100 %; se solapan 1px
+   con la sección vecina para que no quede ninguna línea fina entre ambas. */
+:root { --ola: 72px; }
+.ola { position: absolute; left: 0; width: 100%; height: calc(var(--ola) + 1px); display: block; pointer-events: none; }
+.ola--abajo { bottom: -1px; }
+.ola--arriba { top: -1px; }
+
+/* El hero termina en una ola rellena de crema, el fondo de la sección siguiente. */
 .hero {
   position: relative; overflow: hidden;
-  padding: 48px 0 112px; color: #fff;
+  padding: 48px 0 calc(var(--ola) + 40px); color: #fff;
   background:
-    linear-gradient(to bottom, transparent calc(100% - 80px), var(--crema)),
     radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--cian) 18%, transparent), transparent 45%),
     radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--azul) 20%, transparent), transparent 50%),
     var(--marino);
@@ -180,18 +186,18 @@
 .seccion__cab { max-width: 60ch; margin: 0 auto var(--e6); text-align: center; }
 .seccion__cab h2 { margin-top: var(--e1); font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.01em; }
 
-/* ── Cómo funciona: bloque azul (con el footer). Sus primeros 80px funden el crema con el marino. ── */
+/* ── Cómo funciona: bloque azul (con el footer). Empieza con una ola rellena de crema: la curva se
+   dibuja sobre el propio bloque para que sus degradados radiales no dejen costura en la unión. ── */
 .como {
-  position: relative; scroll-margin-top: 72px; padding-top: 80px; color: #fff;
+  position: relative; scroll-margin-top: 72px; padding-top: var(--ola); color: #fff;
   background:
-    linear-gradient(to bottom, var(--crema), transparent 80px),
     radial-gradient(circle at 85% 25%, color-mix(in srgb, var(--cian) 12%, transparent), transparent 45%),
     radial-gradient(circle at 10% 70%, color-mix(in srgb, var(--azul) 18%, transparent), transparent 50%),
     var(--marino);
 }
-/* Partículas: debajo del contenido, desde el fin del degradado; atenuadas en el centro, donde está el texto. */
+/* Partículas: debajo del contenido, desde el fin de la ola; atenuadas en el centro, donde está el texto. */
 .como__particulas {
-  position: absolute; top: 80px; left: 0; width: 100%; height: calc(100% - 80px); pointer-events: none;
+  position: absolute; top: var(--ola); left: 0; width: 100%; height: calc(100% - var(--ola)); pointer-events: none;
   -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 55%, rgba(0, 0, 0, 0.25) 35%, #000 90%);
   mask-image: radial-gradient(ellipse 60% 50% at 50% 55%, rgba(0, 0, 0, 0.25) 35%, #000 90%);
 }
@@ -307,7 +313,8 @@
   .hero__beneficios li + li { border-left: 0; }
 }
 @media (max-width: 600px) {
-  .hero { padding: var(--e6) 0 112px; }
+  :root { --ola: 40px; }
+  .hero { padding: var(--e6) 0 calc(var(--ola) + 40px); }
   .hero h1 { font-size: var(--t-2xl); }
   .intake { padding: var(--e5) var(--e4); }
   .modos { grid-template-columns: 1fr; }
