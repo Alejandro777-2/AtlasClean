@@ -3,6 +3,7 @@
  * El precio por mes y el ahorro se calculan en planes.js; aquí no se escribe ninguna cifra.
  */
 import { Boton, Insignia } from '../components/ui.jsx';
+import Particulas from '../components/Particulas.jsx';
 import { CONFIG_PLANES, calcularPlanes, formatoMoneda, formatoPorcentaje } from '../planes.js';
 
 const PLANES = calcularPlanes();
@@ -12,6 +13,14 @@ const NOTA = [`Precios en ${CONFIG_PLANES.moneda}.`, CONFIG_PLANES.notaIva, CONF
 export default function Planes() {
   return (
     <section id="planes" className="planes">
+      {/* Las tarjetas ocupan ~1168px: las franjas laterales empiezan fuera de ellas. */}
+      <Particulas
+        tema="claro"
+        cantidad={45}
+        cantidadMovil={20}
+        opciones={{ laterales: { proporcion: 0.7, anchoCentral: 1200 } }}
+        className="particulas-claras particulas-claras--planes"
+      />
       <div className="seccion">
         <div className="seccion__cab">
           <p className="antetitulo" data-aparecer>

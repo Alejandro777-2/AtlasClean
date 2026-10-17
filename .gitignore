@@ -30,3 +30,8 @@ dist-ssr
 
 # Solicitudes de clientes (datos personales): se quedan en la computadora, nunca a git
 registros/
+
+# Archivos generados o temporales que no van al repositorio
+__pycache__/
+*.pyc
+~$*

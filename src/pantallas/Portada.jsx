@@ -6,6 +6,7 @@ import Planes from './Planes.jsx';
 import Recorrido from '../components/Recorrido.jsx';
 import { useSolicitud } from '../estado/contexto.js';
 import { DESDE_LANDING } from '../config/opciones.js';
+import Particulas from '../components/Particulas.jsx';
 
 // Dos formas de empezar la cotización (pestañas con forma de tarjeta).
 const MODOS = [
@@ -268,7 +269,10 @@ export default function Portada({ sesion }) {
           <Ola lado="abajo" color="var(--crema)" colorMedio="var(--ola-medio)" />
         </section>
 
-        <section id="cotizar" className="seccion">
+        {/* Sección a lo ancho (para las partículas) con el contenido en .seccion. */}
+        <section id="cotizar" className="cotizar">
+          <Particulas tema="claro" cantidad={45} cantidadMovil={20} className="particulas-claras" />
+          <div className="seccion">
           <div className="seccion__cab">
             <p className="antetitulo" data-aparecer>
               Cotizar
@@ -369,6 +373,7 @@ export default function Portada({ sesion }) {
                   <SubirPliego />
                 </div>
             </div>
+          </div>
           </div>
         </section>
 

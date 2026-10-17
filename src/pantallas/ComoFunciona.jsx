@@ -100,7 +100,7 @@ export default function ComoFunciona() {
       onFocus={() => setFocoDentro(true)}
       onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setFocoDentro(false)}
     >
-      <Particulas cantidad={movil ? 25 : 55} className="como__particulas" />
+      <Particulas tema="oscuro" cantidad={55} cantidadMovil={25} className="como__particulas" />
       <Ola lado="arriba" color="var(--crema)" colorMedio="var(--ola-medio)" />
 
       <div className="seccion">
