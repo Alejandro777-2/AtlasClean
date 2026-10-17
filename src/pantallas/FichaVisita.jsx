@@ -12,6 +12,7 @@ import { CAMPOS_DESDE_DOCUMENTO, valorLegible } from '../formulario/desdeDocumen
 import { REGISTRO } from '../pasos.js';
 import { estimarPresupuesto, textoRango } from '../presupuesto/estimar.js';
 import { MODULOS_COTIZACION } from '../config/opciones.js';
+import { rutaModulo } from '../estado/rutas.js';
 
 /** Nombre real de la zona (del pliego o del cliente) y, debajo, su categoría. */
 export function CeldaZona({ zona: z }) {
@@ -153,7 +154,7 @@ export default function FichaVisita() {
           titulo={`Se completaron ${desdeDocumento.length} dato${desdeDocumento.length === 1 ? '' : 's'} del formulario con el documento`}
           acciones={
             <>
-              <Boton variante="secundario" href={`#/app/${REGISTRO.id}`} target="_blank" rel="opener">
+              <Boton variante="secundario" href={rutaModulo(REGISTRO.id)} target="_blank" rel="opener">
                 Ver registro ↗
               </Boton>
               {puedeDeshacerDocumento && (
@@ -183,7 +184,7 @@ export default function FichaVisita() {
           {presupuesto.disponible ? (
             <>
               Presupuesto previo (orientativo): <strong>{textoRango(presupuesto.mensual)}</strong> mensuales + IVA ·{' '}
-              <a href="#/app/costos">ver detalle en Costos</a>
+              <a href={rutaModulo('costos')}>ver el detalle</a>
             </>
           ) : (
             <>Estimación previa: {ficha.estimacionPrevia}</>

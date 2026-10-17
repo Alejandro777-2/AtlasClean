@@ -1,6 +1,8 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { AtlasLogo, Boton, Campo, Pestanas } from '../components/ui.jsx';
 import ComoFunciona from './ComoFunciona.jsx';
+import { useSolicitud } from '../estado/contexto.js';
+import { DESDE_LANDING } from '../config/opciones.js';
 
 const MODOS = [
   { valor: 'formulario', etiqueta: 'Llenar requisitos' },
@@ -58,13 +60,26 @@ export default function Portada({ sesion }) {
   const [archivo, setArchivo] = useState(null);
   const [analizando, setAnalizando] = useState(false);
 
+  // «Continuar» de la tarjeta Cotizar: lleva al formulario completo del cliente (sin login)
+  // con lo que ya escribió en la tarjeta, para no repetirlo.
+  const formularioTarjeta = useRef(null);
+  const { cambiarVarios, setVista } = useSolicitud();
+  const irAlFormularioCliente = (e) => {
+    e?.preventDefault();
+    const datos = formularioTarjeta.current ? new FormData(formularioTarjeta.current) : null;
+    if (datos) {
+      const buscar = (lista, texto) => lista.find((x) => String(texto ?? '').toLowerCase().includes(x.contiene))?.valor;
+      const empresa = String(datos.get('cliente') ?? '').trim();
+      const tipologia = buscar(DESDE_LANDING.tipologia, datos.get('tipo'));
+      const horario = buscar(DESDE_LANDING.horario, datos.get('turno'));
+      cambiarVarios({ ...(empresa ? { empresa } : {}), ...(tipologia ? { tipologia } : {}), ...(horario ? { horario } : {}) });
+    }
+    setVista('formulario');
+    window.location.hash = '#/cliente/visita/formulario';
+  };
+
   // Con sesión se entra directo a la plataforma; sin sesión, al login.
   const destinoApp = sesion ? '#/app/requisitos' : '#/login';
-
-  const irAPlataforma = (e) => {
-    e.preventDefault();
-    window.location.hash = destinoApp;
-  };
 
   // Envía el pliego al backend (/api, proxy de Vite) y pasa a la plataforma con o sin resultado.
   const subirDocumento = async (file) => {
@@ -165,7 +180,7 @@ export default function Portada({ sesion }) {
               <Pestanas etiqueta="Cómo empezar" opciones={MODOS} valor={modo} alCambiar={setModo} />
 
               {modo === 'formulario' ? (
-                <form className="intake__cuerpo" onSubmit={irAPlataforma}>
+                <form className="intake__cuerpo" onSubmit={irAlFormularioCliente} ref={formularioTarjeta}>
                   <div>
                     <h2>Describe el lugar</h2>
                     <p className="texto-suave">Con estos datos empieza la cotización.</p>

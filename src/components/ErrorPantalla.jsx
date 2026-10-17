@@ -5,6 +5,7 @@
 import { Component } from 'react';
 import { Aviso, AtlasLogo, Boton } from './ui.jsx';
 import { CLAVE_BORRADOR } from '../estado/borrador.js';
+import { rutaModulo } from '../estado/rutas.js';
 
 export default class ErrorPantalla extends Component {
   state = { error: null };
@@ -23,7 +24,7 @@ export default class ErrorPantalla extends Component {
     } catch {
       /* sin almacenamiento: no hay nada que borrar */
     }
-    window.location.hash = '#/app/visita';
+    window.location.hash = rutaModulo('visita');
     window.location.reload();
   };
 

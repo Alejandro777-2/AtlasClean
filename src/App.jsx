@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Portada from './pantallas/Portada.jsx';
 import Plataforma from './pantallas/Plataforma.jsx';
 import Login from './pantallas/Login.jsx';
+import EspacioCliente from './pantallas/EspacioCliente.jsx';
 import ProveedorSolicitud from './estado/ProveedorSolicitud.jsx';
 import ErrorPantalla from './components/ErrorPantalla.jsx';
 
@@ -39,7 +40,9 @@ export default function App() {
   const [seccion, paso] = ruta.split('/');
 
   let pantalla;
-  if (seccion === 'login') pantalla = <Login alAutenticar={alAutenticar} />;
+  // #/cliente/<sección>: espacio público del cliente (sin login), al que se entra desde la landing.
+  if (seccion === 'cliente') pantalla = <EspacioCliente seccion={paso || 'visita'} />;
+  else if (seccion === 'login') pantalla = <Login alAutenticar={alAutenticar} />;
   else if (seccion === 'app') pantalla = sesion ? <Plataforma pasoId={paso || 'requisitos'} sesion={sesion} alCerrarSesion={alCerrarSesion} /> : <Login alAutenticar={alAutenticar} />;
   else pantalla = <Portada sesion={sesion} />;
 

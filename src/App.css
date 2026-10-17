@@ -341,6 +341,10 @@
 .lateral__num { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--marino-linea); font-size: var(--t-xs); font-weight: 800; }
 .lateral__paso[aria-current='page'] .lateral__num { border-color: var(--cian); color: var(--cian); }
 .lateral__nav { display: grid; gap: var(--e5); }
+.lateral__pie { margin-top: auto; display: grid; gap: var(--e2); }
+.lateral__pie .lateral__volver { margin-top: 0; }
+.lateral__equipo { padding: 0 var(--e3); font-size: var(--t-xs); color: var(--texto-sobre-marino-suave); }
+.lateral__equipo:hover { color: #fff; }
 .lateral__num--ia { border-color: var(--cian); color: var(--cian); font-size: 0.625rem; }
 .lateral__volver { margin-top: auto; padding: var(--e3) var(--e3) 0; border-top: 1px solid var(--marino-linea); font-size: var(--t-sm); text-decoration: none; color: var(--texto-sobre-marino-suave); }
 .lateral__volver:hover { color: #fff; }

@@ -6,6 +6,7 @@ import { Aviso, Boton, Tabla } from '../components/ui.jsx';
 import { useSolicitud } from '../estado/contexto.js';
 import { MODULOS_COTIZACION } from '../config/opciones.js';
 import { requisitoDe } from '../formulario/fichaUtil.js';
+import { rutaModulo } from '../estado/rutas.js';
 
 const filas = (detalles) =>
   detalles.map((d, i) => ({
@@ -58,7 +59,7 @@ export function RequisitosModulo({ modulo }) {
 
   if (!ficha) {
     return (
-      <Aviso tono="info" titulo="Este cálculo es parte del módulo de cotización" acciones={<Boton variante="secundario" href="#/app/visita" onClick={() => setVista('formulario')}>Ir al asistente de visita</Boton>}>
+      <Aviso tono="info" titulo="Este cálculo es parte del módulo de cotización" acciones={<Boton variante="secundario" href={rutaModulo('visita')} onClick={() => setVista('formulario')}>Ir al asistente de visita</Boton>}>
         Si el cliente sube su pliego en el Asistente de visita, aquí verás lo que exige para este paso.
       </Aviso>
     );
@@ -74,7 +75,7 @@ export function RequisitosModulo({ modulo }) {
   }
   return (
     <div className="ficha">
-      <Aviso tono="aviso" titulo={`Según el pliego: ${r.resumen}`} acciones={<Boton variante="secundario" href="#/app/visita" onClick={() => setVista('ficha')}>Ver la ficha completa</Boton>}>
+      <Aviso tono="aviso" titulo={`Según el pliego: ${r.resumen}`} acciones={<Boton variante="secundario" href={rutaModulo('visita')} onClick={() => setVista('ficha')}>Ver la ficha completa</Boton>}>
         Es lo que exige el cliente. El cálculo de este paso lo hace el módulo de cotización.
       </Aviso>
       {r.detalles.length > 0 && <Tabla columnas={COLUMNAS} filas={filas(r.detalles)} />}

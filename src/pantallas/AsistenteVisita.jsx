@@ -9,6 +9,7 @@ import { useSolicitud } from '../estado/contexto.js';
 import { validarFormulario } from '../formulario/solicitud.js';
 import FormularioCliente, { EstadoIa } from './FormularioCliente.jsx';
 import FichaVisita from './FichaVisita.jsx';
+import { rutaModulo } from '../estado/rutas.js';
 
 // Lo que exige el formulario para generar la ficha (mismas claves que validarFormulario).
 const REQUISITOS = [
@@ -119,7 +120,7 @@ function FichaPendiente() {
 /** Abre el registro detallado del formulario en una ventana nueva del navegador. */
 export function BotonRegistro({ variante = 'fantasma' }) {
   return (
-    <Boton variante={variante} href={`#/app/${REGISTRO.id}`} target="_blank" rel="opener" className="boton--registro">
+    <Boton variante={variante} href={rutaModulo(REGISTRO.id)} target="_blank" rel="opener" className="boton--registro">
       Ver registro detallado ↗
     </Boton>
   );

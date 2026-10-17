@@ -7,6 +7,7 @@ import { useSolicitud } from '../estado/contexto.js';
 import { ETIQUETAS } from '../config/opciones.js';
 import { CeldaZona } from './FichaVisita.jsx';
 import { m2Zona } from '../formulario/fichaUtil.js';
+import { rutaModulo } from '../estado/rutas.js';
 
 const TONO_RIESGO = (r) => (r >= 5 ? 'error' : r >= 3 ? 'aviso' : 'info');
 
@@ -20,7 +21,7 @@ export default function PasoRequisitos() {
         tono="info"
         titulo="Primero prepara la visita"
         acciones={
-          <Boton variante="primario" href="#/app/visita" onClick={abrir('formulario')}>
+          <Boton variante="primario" href={rutaModulo('visita')} onClick={abrir('formulario')}>
             Ir al asistente de visita
           </Boton>
         }
@@ -37,7 +38,7 @@ export default function PasoRequisitos() {
         tono="aviso"
         titulo="Punto de partida: supuestos de la ficha de visita"
         acciones={
-          <Boton variante="secundario" href="#/app/visita" onClick={abrir('ficha')}>
+          <Boton variante="secundario" href={rutaModulo('visita')} onClick={abrir('ficha')}>
             Ver la ficha completa
           </Boton>
         }

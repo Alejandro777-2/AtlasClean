@@ -7,6 +7,7 @@ import { useSolicitud } from '../estado/contexto.js';
 import { estimarPresupuesto, textoRango } from '../presupuesto/estimar.js';
 import { requisitoDe, paginaDe } from '../formulario/fichaUtil.js';
 import { CONTACTO_ATLAS } from '../config/contacto.js';
+import { rutaModulo } from '../estado/rutas.js';
 
 /** Imprime solo el presupuesto previo (y el contacto): nunca lo interno del cotizador que esté en la misma página. */
 function imprimirPresupuesto() {
@@ -88,7 +89,7 @@ export default function PasoCostos() {
           tono="info"
           titulo="Aún no se puede estimar un presupuesto previo"
           acciones={
-            <Boton variante="primario" href="#/app/visita" onClick={() => setVista('formulario')}>
+            <Boton variante="primario" href={rutaModulo('visita')} onClick={() => setVista('formulario')}>
               Ir al asistente de visita
             </Boton>
           }
@@ -168,7 +169,7 @@ export default function PasoCostos() {
         <Boton variante="primario" onClick={imprimirPresupuesto}>
           Imprimir presupuesto para el cliente
         </Boton>
-        <Boton variante="secundario" href="#/app/visita" onClick={() => setVista('ficha')}>
+        <Boton variante="secundario" href={rutaModulo('visita')} onClick={() => setVista('ficha')}>
           Ver la ficha de visita
         </Boton>
       </div>

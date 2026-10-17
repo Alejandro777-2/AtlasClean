@@ -13,7 +13,7 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 - `src/index.css`: tokens (colores, tipografía, espacios, radios, sombras) y estilos de los componentes.
 - `src/components/ui.jsx`: componentes compartidos (`AtlasLogo`, `Boton`, `Insignia`, `TarjetaKpi`, `Campo`, `Opciones`, `Tabla`, `Aviso`, `Pestanas`).
 - `src/App.css`: diseño de la landing, de la plataforma y del módulo del cliente.
-- `src/App.jsx`: rutas por hash: `#/` landing, `#/login`, `#/app/<paso>` plataforma (requiere sesión). `#/app/visita` y `#/app/registro` son el módulo del cliente. Envuelve todo en `ErrorPantalla` y `ProveedorSolicitud`.
+- `src/App.jsx`: rutas por hash: `#/` landing, `#/login`, `#/app/<paso>` plataforma del equipo (requiere sesión; incluye `#/app/visita` y `#/app/registro`) y `#/cliente/<sección>` espacio del cliente sin login (`visita`, `registro`, `presupuesto`). Envuelve todo en `ErrorPantalla` y `ProveedorSolicitud`.
 - `src/pantallas/Portada.jsx`: la landing (encabezado, hero, sección del formulario, cómo funciona y pie).
 - `src/pantallas/ComoFunciona.jsx`: la sección "Cómo funciona" (maestro-detalle / acordeón).
 - `src/pantallas/Login.jsx`: acceso a la plataforma (credenciales demo).
@@ -22,6 +22,8 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 - `src/pasos.js`: contenido de los 6 pasos (título, subtítulo, descripción y viñetas) y las secciones del cliente (`VISITA`, `REGISTRO`).
 
 ### Módulo del cliente (antes de la visita)
+- Entrada del cliente: en la landing, tarjeta «Cotizar» → «Continuar». Lleva a `#/cliente/visita/formulario` con la empresa, el tipo de sitio y el turno de la tarjeta ya puestos (traducción en `DESDE_LANDING` de `src/config/opciones.js`).
+- `src/pantallas/EspacioCliente.jsx`: espacio del cliente sin login, con la misma distribución que la plataforma pero solo con su solicitud, el registro y el presupuesto previo. `src/estado/rutas.js` hace que los enlaces del módulo se queden en el espacio en que está la persona (`#/cliente` o `#/app`).
 - `src/pantallas/ContenidoCliente.jsx`: lo que la plataforma muestra en `#/app/visita` y `#/app/registro` (grupo «Antes de la visita» de la barra lateral).
 - `src/pantallas/AsistenteVisita.jsx`: pestañas `FormularioCliente` y `FichaVisita`.
 - `src/pantallas/RegistroFormulario.jsx` (`#/app/registro`): registro detallado del formulario; se abre en ventana nueva y se sincroniza con la otra ventana por el evento `storage`. Campos en `src/formulario/registro.js`.

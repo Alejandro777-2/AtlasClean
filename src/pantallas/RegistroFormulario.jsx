@@ -1,11 +1,12 @@
 /**
- * Registro detallado del formulario del cliente. Se abre en una ventana nueva (#/app/registro)
+ * Registro detallado del formulario del cliente. Se abre en una ventana nueva (#/app/registro o #/cliente/registro)
  * y se actualiza solo cuando se edita el formulario en la otra ventana.
  */
 import { Aviso, Boton, Insignia, Tabla } from '../components/ui.jsx';
 import { useSolicitud } from '../estado/contexto.js';
 import { aSolicitud } from '../formulario/solicitud.js';
 import { armarRegistro } from '../formulario/registro.js';
+import { rutaModulo } from '../estado/rutas.js';
 
 const ESTADO = {
   listo: { tono: 'ok', texto: 'Listo' },
@@ -21,14 +22,14 @@ function irAlFormulario(setVista) {
   setVista('formulario');
   try {
     if (window.opener && !window.opener.closed) {
-      window.opener.location.hash = '#/app/visita';
+      window.opener.location.hash = rutaModulo('visita');
       window.opener.focus();
       return;
     }
   } catch {
     /* la otra ventana no es accesible: se navega en esta */
   }
-  window.location.hash = '#/app/visita';
+  window.location.hash = rutaModulo('visita');
 }
 
 export default function RegistroFormulario() {

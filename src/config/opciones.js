@@ -121,3 +121,21 @@ export const MODULOS_COTIZACION = [
 ];
 export const TONO_CONFIANZA = { alta: 'ok', media: 'info', baja: 'aviso' };
 export const TONO_PRIORIDAD = { alta: 'error', media: 'aviso', baja: 'neutro' };
+
+// Tarjeta «Cotizar» de la landing → formulario completo del cliente.
+// Traduce los textos de esa tarjeta a los valores del formulario (para que el cliente no los escriba dos veces).
+export const DESDE_LANDING = {
+  tipologia: [
+    { contiene: 'salud', valor: 'general_healthcare' },
+    { contiene: 'comercial', valor: 'food_court_retail' },
+    { contiene: 'corporativo', valor: 'corporate_office' },
+    { contiene: 'industrial', valor: 'industrial_logistics' },
+    { contiene: 'educativo', valor: 'educational_campus' }
+  ],
+  horario: [
+    { contiene: '24/7', valor: ['24_7'] },
+    { contiene: 'nocturno', valor: ['nocturno'] },
+    { contiene: 'matutino', valor: ['diurno'] },
+    { contiene: 'vespertino', valor: ['diurno'] }
+  ]
+};
