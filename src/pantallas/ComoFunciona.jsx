@@ -6,7 +6,7 @@
  * Sin avance en móvil ni con prefers-reduced-motion.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Boton } from '../components/ui.jsx';
+import { Boton, Ola } from '../components/ui.jsx';
 import Particulas from '../components/Particulas.jsx';
 import { PASOS } from '../pasos.js';
 
@@ -101,17 +101,20 @@ export default function ComoFunciona() {
       onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setFocoDentro(false)}
     >
       <Particulas cantidad={movil ? 25 : 55} className="como__particulas" />
+      <Ola lado="arriba" color="var(--crema)" colorMedio="var(--ola-medio)" />
 
       <div className="seccion">
         <div className="seccion__cab">
-          <p className="antetitulo">Cómo funciona</p>
-          <h2>Seis pasos, de los requisitos a la propuesta</h2>
+          <p className="antetitulo" data-aparecer>
+            Cómo funciona
+          </p>
+          <h2 data-aparecer>Seis pasos, de los requisitos a la propuesta</h2>
         </div>
 
         {movil ? (
           <div className="como__acordeon">
             {PASOS.map((p, i) => (
-              <div key={p.id} className="como__item">
+              <div key={p.id} className="como__item" data-aparecer>
                 <button
                   type="button"
                   id={`acordeon-${p.id}`}
@@ -136,7 +139,8 @@ export default function ComoFunciona() {
           </div>
         ) : (
           <div className="como__rejilla">
-            <div className="como__lista" ref={lista}>
+            {/* La lista aparece entera: línea y nodos se colocan midiendo las tarjetas. */}
+            <div className="como__lista" ref={lista} data-aparecer>
               {centros.length === PASOS.length && (
                 <div aria-hidden="true">
                   <span className="como__riel" style={{ top: centros[0], height: centros[PASOS.length - 1] - centros[0] }} />
@@ -177,7 +181,7 @@ export default function ComoFunciona() {
             </div>
 
             {/* Los 6 paneles comparten celda: la caja toma la altura del más largo y no salta. */}
-            <div className="como__detalle">
+            <div className="como__detalle" data-aparecer>
               {PASOS.map((p, i) => (
                 <div
                   key={p.id}
@@ -194,6 +198,8 @@ export default function ComoFunciona() {
           </div>
         )}
       </div>
+      {/* Salida hacia "Planes" (beige): la curva se dibuja sobre el azul, como la de entrada. */}
+      <Ola lado="abajo" color="var(--crema)" colorMedio="var(--ola-medio)" />
     </section>
   );
 }
