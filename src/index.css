@@ -128,15 +128,9 @@ a { color: inherit; }
 .entrada:hover { border-color: var(--texto-suave); }
 .entrada:focus { outline: none; border-color: var(--azul); box-shadow: var(--foco); }
 .entrada[type='number'] { text-align: right; font-variant-numeric: tabular-nums; }
-
-/* ── Pestañas segmentadas ── */
-.pestanas { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--e1); padding: var(--e1); background: var(--superficie-2); border-radius: var(--radio-lg); }
-.pestanas__boton {
-  min-height: 40px; padding: 0 var(--e3);
-  font: inherit; font-size: var(--t-sm); font-weight: 700; color: var(--texto-suave);
-  background: transparent; border: 0; border-radius: var(--radio); cursor: pointer;
-}
-.pestanas__boton[aria-selected='true'] { background: var(--superficie); color: var(--texto); box-shadow: var(--sombra-sm); }
+/* Mensaje de error bajo el campo (Campo con `error`). */
+.campo__error { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--error); }
+.campo__error svg { flex: none; }
 
 /* Recuperados para el flujo de la plataforma y el login. */
 .marca__simbolo {

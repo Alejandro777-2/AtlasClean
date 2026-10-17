@@ -62,17 +62,118 @@
 .hero__beneficios li + li { border-left: 1px solid color-mix(in srgb, #fff 15%, transparent); }
 .hero__beneficios svg { flex: none; color: var(--cian); }
 
-.intake { max-width: 560px; margin: 0 auto; padding: var(--e3); background: var(--superficie); color: var(--texto); border-radius: var(--radio-xl); box-shadow: var(--sombra-lg); }
-.intake__cuerpo { display: grid; gap: var(--e4); padding: var(--e5) var(--e3) var(--e3); }
-.intake h2 { font-size: var(--t-lg); font-weight: 800; }
-.intake__fila { display: grid; grid-template-columns: 1fr 1fr; gap: var(--e3); }
-.intake .insignia { justify-self: start; }
-.subida {
-  display: grid; gap: var(--e1); padding: var(--e5); text-align: center; cursor: pointer;
-  background: var(--info-suave); border: 2px dashed var(--azul); border-radius: var(--radio-lg);
+/* Tarjeta del formulario "Cotizar". Sus estilos van acotados a .intake: Campo y .entrada también
+   los usan el login y la plataforma, que no deben cambiar. */
+.intake {
+  --borde-campo: color-mix(in srgb, var(--texto-suave) 45%, var(--linea));
+  display: grid; gap: 20px; max-width: 680px; margin: 0 auto; padding: var(--e6);
+  background: var(--superficie); color: var(--texto); border-radius: var(--radio-xl); box-shadow: var(--sombra-lg);
 }
-.subida:hover { border-color: var(--marino); }
-.subida:focus-within { box-shadow: var(--foco); }
+.intake__cuerpo { display: grid; gap: 20px; }
+
+/* Progreso: "Paso 1 de 6" y seis segmentos (el primero en cian). */
+.intake__progreso { display: grid; gap: var(--e2); }
+.intake__paso { font-size: 13px; font-weight: 600; color: var(--info); }
+.intake__segmentos { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.intake__segmentos span { height: 4px; border-radius: 999px; background: var(--linea); }
+.intake__segmentos span:first-child { background: var(--cian); }
+
+/* Modos como tarjetas seleccionables (pestañas). El 2.º px del borde activo es un box-shadow
+   para que no cambie el tamaño al seleccionar. */
+.modos { display: grid; grid-template-columns: 1fr 1fr; gap: var(--e3); }
+.modo {
+  display: flex; align-items: center; gap: var(--e3); min-height: 72px; padding: var(--e3) var(--e4);
+  font: inherit; text-align: left; color: var(--texto); cursor: pointer;
+  background: var(--superficie); border: 1px solid var(--borde-campo); border-radius: var(--radio);
+  transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+}
+.modo:hover { border-color: var(--texto-suave); }
+.modo svg { flex: none; color: var(--texto-suave); transition: color 150ms ease; }
+.modo__texto { display: grid; gap: 2px; min-width: 0; }
+.modo__titulo { display: flex; align-items: center; gap: var(--e2); font-size: 15px; font-weight: 600; }
+.modo__desc { font-size: 13px; color: var(--texto-suave); }
+.modo__ia { padding: 1px 8px; border-radius: 999px; font-size: var(--t-xs); font-weight: 700; color: var(--marino); background: color-mix(in srgb, var(--cian) 25%, #fff); }
+.modo[aria-selected='true'] { border-color: var(--cian); background: var(--info-suave); box-shadow: inset 0 0 0 1px var(--cian); }
+.modo[aria-selected='true'] svg { color: var(--cian); }
+.modo[aria-selected='true']:focus-visible { box-shadow: inset 0 0 0 1px var(--cian), var(--foco); }
+
+/* Campos: 16px (evita el zoom de iOS al enfocar), 48px de alto, mismo borde y radio. */
+.intake .campo { gap: var(--e2); }
+.intake .campo__etiqueta { font-size: var(--t-md); font-weight: 600; color: var(--marino); }
+.intake .campo__ayuda { font-size: var(--t-md); color: var(--texto-suave); }
+.intake .entrada {
+  min-height: 48px; padding: 12px 14px; font-size: 16px; line-height: 22px;
+  border: 1px solid var(--borde-campo); border-radius: var(--radio);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.intake select.entrada { height: 48px; }
+.intake .entrada:hover { border-color: var(--texto-suave); }
+/* El anillo sustituye al outline; el outline transparente sigue visible en modo de alto contraste. */
+.intake .entrada:focus { outline: 2px solid transparent; border-color: var(--cian); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cian) 25%, transparent); }
+.intake .entrada[aria-invalid='true'] { border-color: color-mix(in srgb, var(--error) 65%, transparent); }
+.intake .entrada[aria-invalid='true']:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 20%, transparent); }
+
+/* Continuar: mismo estilo que el CTA del hero (variante destacado), a lo ancho. */
+.intake__continuar { width: 100%; min-height: 52px; font-size: 16px; font-weight: 600; }
+.intake__flecha { transition: transform 150ms ease; }
+.intake__continuar:hover .intake__flecha { transform: translateX(4px); }
+.intake__continuar[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
+.intake__continuar[aria-disabled='true']:hover { background: var(--cian); }
+.intake__continuar[aria-disabled='true']:hover .intake__flecha { transform: none; }
+.intake__nota { margin-top: calc(-1 * var(--e2)); text-align: center; font-size: 13px; color: var(--texto-suave); }
+
+/* Paneles de los dos modos en la misma celda: altura compartida y fundido de 200ms al cambiar. */
+.intake__paneles { display: grid; }
+.intake__panel { grid-area: 1 / 1; align-content: start; opacity: 0; visibility: hidden; transition: opacity 200ms ease, visibility 0s 200ms; }
+.intake__panel--activo { opacity: 1; visibility: visible; transition: opacity 200ms ease; }
+
+/* ── Subir pliego ── */
+/* Gris azulado oscuro para textos secundarios sobre el azul claro (> 4.5:1). */
+.intake { --texto-secundario: color-mix(in srgb, var(--texto-suave) 75%, var(--marino)); }
+.pliego__extrae { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); }
+.pliego__extrae-rotulo { font-size: 13px; font-weight: 600; color: var(--texto-secundario); }
+.pliego__chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--e2); }
+.pliego__chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 13px;
+  background: var(--superficie); border: 1px solid color-mix(in srgb, var(--azul) 35%, #fff); border-radius: 999px;
+}
+.pliego__chip svg { color: var(--info); }
+
+.zona {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--e2);
+  min-height: 200px; padding: var(--e5); text-align: center; cursor: pointer; color: var(--texto);
+  background: var(--info-suave); border: 2px dashed var(--cian); border-radius: var(--radio-lg);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+.zona > svg { color: var(--info); }
+.zona:hover, .zona:focus-visible { border-color: var(--azul); }
+.zona--arrastrando { border-style: solid; border-color: var(--cian); background: color-mix(in srgb, var(--cian) 22%, #fff); }
+.zona--error { border-color: color-mix(in srgb, var(--error) 65%, transparent); }
+.zona__titulo { font-size: 16px; font-weight: 600; }
+.zona__formatos { font-size: var(--t-md); color: var(--texto-secundario); }
+.zona--archivo { cursor: default; align-items: stretch; gap: var(--e3); }
+.zona--archivo:hover { border-color: var(--cian); }
+
+.archivo { display: flex; align-items: center; gap: var(--e3); padding: var(--e3) var(--e4); text-align: left; background: var(--superficie); border: 1px solid var(--borde-campo); border-radius: var(--radio); }
+.archivo__icono { flex: none; color: var(--info); }
+.archivo__datos { flex: 1; display: grid; min-width: 0; }
+.archivo__nombre { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.archivo__tamano { font-size: 13px; color: var(--texto-secundario); }
+.archivo__ok { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--ok); background: var(--ok-suave); }
+.archivo__quitar { flex: none; padding: 4px 6px; font: inherit; font-size: var(--t-md); font-weight: 600; color: var(--info); background: none; border: 0; border-radius: var(--radio-sm); cursor: pointer; }
+.archivo__quitar:hover { text-decoration: underline; }
+
+/* Progreso indeterminado: fetch no informa del avance; lo que tarda es el análisis. */
+.archivo__progreso { position: relative; display: block; height: 4px; overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--cian) 20%, #fff); }
+.archivo__progreso::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; border-radius: inherit; background: var(--cian); animation: progreso-indeterminado 1.2s ease-in-out infinite; }
+@keyframes progreso-indeterminado { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+@media (prefers-reduced-motion: reduce) { .archivo__progreso::after { animation: none; width: 100%; opacity: 0.6; } }
+
+.zona__mensaje-error { display: flex; align-items: flex-start; gap: 6px; margin-top: calc(-1 * var(--e2)); font-size: 13px; color: var(--error); }
+.zona__mensaje-error svg { flex: none; margin-top: 2px; }
+.zona__reintentar { padding: 0; font: inherit; font-weight: 600; color: var(--info); text-decoration: underline; background: none; border: 0; cursor: pointer; }
+.pliego__privacidad { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--texto-secundario); }
+.pliego__privacidad svg { flex: none; }
 
 /* Secciones bajo el hero (cotizar, cómo funciona). scroll-margin: que el encabezado fijo no las tape. */
 .seccion { max-width: 1200px; margin: 0 auto; padding: 64px var(--e4); scroll-margin-top: 72px; }
@@ -208,7 +309,8 @@
 @media (max-width: 600px) {
   .hero { padding: var(--e6) 0 112px; }
   .hero h1 { font-size: var(--t-2xl); }
-  .intake__fila { grid-template-columns: 1fr; }
+  .intake { padding: var(--e5) var(--e4); }
+  .modos { grid-template-columns: 1fr; }
 }
 
 /* ── Login y Autenticación ── */

@@ -55,29 +55,29 @@ export function TarjetaKpi({ etiqueta, valor = '—', detalle, variante }) {
   );
 }
 
-/** `children` es una función que recibe el id para enlazar la etiqueta con el control. */
-export function Campo({ etiqueta, ayuda, children }) {
+/**
+ * `children(id, idError)`: id para enlazar la etiqueta con el control e id del mensaje de error
+ * (solo si hay `error`), para usarlo en aria-describedby.
+ */
+export function Campo({ etiqueta, ayuda, error, children }) {
   const id = useId();
+  const idError = error ? `${id}-error` : undefined;
   return (
     <div className="campo">
       <label className="campo__etiqueta" htmlFor={id}>
         {etiqueta}
       </label>
-      {children(id)}
+      {children(id, idError)}
       {ayuda && <span className="campo__ayuda">{ayuda}</span>}
-    </div>
-  );
-}
-
-/** opciones: [{ valor, etiqueta }] */
-export function Pestanas({ opciones, valor, alCambiar, etiqueta }) {
-  return (
-    <div className="pestanas" role="tablist" aria-label={etiqueta}>
-      {opciones.map((o) => (
-        <button key={o.valor} type="button" role="tab" aria-selected={o.valor === valor} className="pestanas__boton" onClick={() => alCambiar(o.valor)}>
-          {o.etiqueta}
-        </button>
-      ))}
+      {error && (
+        <span id={idError} className="campo__error">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7.5v5M12 16.5h0" />
+          </svg>
+          {error}
+        </span>
+      )}
     </div>
   );
 }

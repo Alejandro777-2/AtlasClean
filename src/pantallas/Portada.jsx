@@ -1,11 +1,30 @@
 ﻿import { useEffect, useRef, useState } from 'react';
-import { AtlasLogo, Boton, Campo, Pestanas } from '../components/ui.jsx';
+import { AtlasLogo, Boton, Campo } from '../components/ui.jsx';
 import ComoFunciona from './ComoFunciona.jsx';
+import SubirPliego from './SubirPliego.jsx';
 
+// Dos formas de empezar la cotización (pestañas con forma de tarjeta).
 const MODOS = [
-  { valor: 'formulario', etiqueta: 'Llenar requisitos' },
-  { valor: 'documento', etiqueta: 'Subir pliego con IA' }
+  {
+    valor: 'formulario',
+    etiqueta: 'Llenar requisitos',
+    descripcion: 'Responde unas preguntas rápidas',
+    icono: <path d="M10 6h10M10 12h10M10 18h10M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17" />
+  },
+  {
+    valor: 'documento',
+    etiqueta: 'Subir pliego con IA',
+    descripcion: 'Sube el documento y Atlas lo lee',
+    ia: true,
+    icono: (
+      <>
+        <path d="M12 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+        <path d="M9 13h6M9 17h4M18 2v6M15 5h6" />
+      </>
+    )
+  }
 ];
+const SEGMENTOS = 6;
 // Mismas tipologías y turnos que usa la plataforma.
 const TIPOS_SITIO = [
   'Salud / Salas de hospitalización / Áreas críticas hospitalarias',
@@ -55,37 +74,40 @@ const GRUPOS = [
 
 export default function Portada({ sesion }) {
   const [modo, setModo] = useState('formulario');
-  const [archivo, setArchivo] = useState(null);
-  const [analizando, setAnalizando] = useState(false);
 
   // Con sesión se entra directo a la plataforma; sin sesión, al login.
   const destinoApp = sesion ? '#/app/requisitos' : '#/login';
 
+  // Único obligatorio: "Empresa o entidad" (los selectores siempre tienen una opción elegida).
+  // Se valida al salir del campo y al intentar continuar.
+  const [cliente, setCliente] = useState('');
+  const [tocado, setTocado] = useState(false);
+  const clienteRef = useRef(null);
+  const valido = cliente.trim() !== '';
+  const errorCliente = tocado && !valido ? 'Escribe el nombre de la empresa' : null;
+
   const irAPlataforma = (e) => {
     e.preventDefault();
+    if (!valido) {
+      setTocado(true);
+      clienteRef.current?.focus();
+      return;
+    }
     window.location.hash = destinoApp;
   };
 
-  // Envía el pliego al backend (/api, proxy de Vite) y pasa a la plataforma con o sin resultado.
-  const subirDocumento = async (file) => {
-    if (!file) return;
-    setArchivo(file.name);
-    setAnalizando(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const resp = await fetch('/api/analizar-documento', { method: 'POST', body: formData });
-      if (resp.ok) {
-        const json = await resp.json();
-        if (json.datos) sessionStorage.setItem('atlas_datos_ia_precargados', JSON.stringify(json.datos));
-      }
-    } catch (e) {
-      console.warn('Error analizando documento en portada:', e);
-    } finally {
-      setAnalizando(false);
-      window.location.hash = destinoApp;
-    }
+  // Pestañas de modo: flechas izquierda/derecha (y Home/End) mueven el foco y activan el modo.
+  const modosRef = useRef([]);
+  const alTeclearModos = (e) => {
+    const actual = MODOS.findIndex((m) => m.valor === modo);
+    const destino = { ArrowRight: actual + 1, ArrowLeft: actual - 1, Home: 0, End: MODOS.length - 1 }[e.key];
+    if (destino === undefined) return;
+    e.preventDefault();
+    const i = (destino + MODOS.length) % MODOS.length;
+    setModo(MODOS[i].valor);
+    modosRef.current[i].focus();
   };
+
 
   // Pausa las animaciones del fondo cuando el hero sale de pantalla (ahorra batería).
   const heroRef = useRef(null);
@@ -162,51 +184,107 @@ export default function Portada({ sesion }) {
             <h2>Cuéntanos sobre el lugar</h2>
           </div>
           <div className="intake">
-              <Pestanas etiqueta="Cómo empezar" opciones={MODOS} valor={modo} alCambiar={setModo} />
+            <div className="intake__progreso">
+              <p className="intake__paso">Paso 1 de 6 · Requisitos</p>
+              <div className="intake__segmentos" aria-hidden="true">
+                {Array.from({ length: SEGMENTOS }, (_, i) => (
+                  <span key={i} />
+                ))}
+              </div>
+            </div>
 
-              {modo === 'formulario' ? (
-                <form className="intake__cuerpo" onSubmit={irAPlataforma}>
-                  <div>
-                    <h2>Describe el lugar</h2>
-                    <p className="texto-suave">Con estos datos empieza la cotización.</p>
-                  </div>
-                  <Campo etiqueta="Empresa o entidad">{(id) => <input id={id} className="entrada" name="cliente" required />}</Campo>
-                  <div className="intake__fila">
-                    <Campo etiqueta="Tipo de sitio">
-                      {(id) => (
-                        <select id={id} className="entrada" name="tipo">
-                          {TIPOS_SITIO.map((t) => (
-                            <option key={t}>{t}</option>
-                          ))}
-                        </select>
-                      )}
-                    </Campo>
-                    <Campo etiqueta="Turnos">
-                      {(id) => (
-                        <select id={id} className="entrada" name="turno">
-                          {TURNOS.map((t) => (
-                            <option key={t}>{t}</option>
-                          ))}
-                        </select>
-                      )}
-                    </Campo>
-                  </div>
-                  <Boton variante="primario" type="submit">
-                    Continuar
+            <div className="modos" role="tablist" aria-label="Cómo quieres empezar" onKeyDown={alTeclearModos}>
+              {MODOS.map((m, i) => (
+                <button
+                  key={m.valor}
+                  ref={(el) => (modosRef.current[i] = el)}
+                  type="button"
+                  role="tab"
+                  id={`modo-${m.valor}`}
+                  className="modo"
+                  aria-selected={m.valor === modo}
+                  aria-controls={`panel-${m.valor}`}
+                  tabIndex={m.valor === modo ? 0 : -1}
+                  onClick={() => setModo(m.valor)}
+                >
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    {m.icono}
+                  </svg>
+                  <span className="modo__texto">
+                    <span className="modo__titulo">
+                      {m.etiqueta}
+                      {m.ia && <span className="modo__ia">IA</span>}
+                    </span>
+                    <span className="modo__desc">{m.descripcion}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Los dos paneles comparten celda: la tarjeta toma la altura del más alto y no salta al
+                cambiar de modo; el inactivo queda oculto e inerte y el cambio es un fundido. */}
+            <div className="intake__paneles">
+                <form
+                  id="panel-formulario"
+                  role="tabpanel"
+                  aria-labelledby="modo-formulario"
+                  className={modo === 'formulario' ? 'intake__cuerpo intake__panel intake__panel--activo' : 'intake__cuerpo intake__panel'}
+                  inert={modo !== 'formulario'}
+                  onSubmit={irAPlataforma}
+                  noValidate
+                >
+                  <Campo etiqueta="Empresa o entidad" error={errorCliente}>
+                    {(id, idError) => (
+                      <input
+                        id={id}
+                        ref={clienteRef}
+                        className="entrada"
+                        name="cliente"
+                        autoComplete="organization"
+                        placeholder="Ej. Clínica San Rafael"
+                        required
+                        value={cliente}
+                        onChange={(e) => setCliente(e.target.value)}
+                        onBlur={() => setTocado(true)}
+                        aria-invalid={Boolean(errorCliente)}
+                        aria-describedby={idError}
+                      />
+                    )}
+                  </Campo>
+                  <Campo etiqueta="Tipo de sitio">
+                    {(id) => (
+                      <select id={id} className="entrada" name="tipo">
+                        {TIPOS_SITIO.map((t) => (
+                          <option key={t}>{t}</option>
+                        ))}
+                      </select>
+                    )}
+                  </Campo>
+                  <Campo etiqueta="Turnos">
+                    {(id) => (
+                      <select id={id} className="entrada" name="turno">
+                        {TURNOS.map((t) => (
+                          <option key={t}>{t}</option>
+                        ))}
+                      </select>
+                    )}
+                  </Campo>
+                  {/* aria-disabled y no disabled: así el clic llega al formulario y muestra qué falta. */}
+                  <Boton variante="destacado" type="submit" className="intake__continuar" aria-disabled={!valido}>
+                    Continuar <span className="intake__flecha" aria-hidden="true">→</span>
                   </Boton>
+                  <p className="intake__nota">Toma unos 2 minutos · Podrás editar después</p>
                 </form>
-              ) : (
-                <div className="intake__cuerpo">
-                  <div>
-                    <h2>Sube el pliego o requerimiento</h2>
-                    <p className="texto-suave">PDF, Word o TXT. La IA extraerá metraje, riesgo y personal sugerido.</p>
-                  </div>
-                  <label className="subida">
-                    <input type="file" className="visualmente-oculto" accept=".pdf,.doc,.docx,.txt" onChange={(e) => subirDocumento(e.target.files[0])} />
-                    <strong>{archivo ?? 'Elige un pliego o TDR (PDF/Word)'}</strong>
-                    <span className="texto-suave">{analizando ? 'Analizando pliego…' : 'Haz clic para seleccionarlo'}</span>
-                  </label>                </div>
-              )}
+                <div
+                  id="panel-documento"
+                  role="tabpanel"
+                  aria-labelledby="modo-documento"
+                  className={modo === 'documento' ? 'intake__cuerpo intake__panel intake__panel--activo' : 'intake__cuerpo intake__panel'}
+                  inert={modo !== 'documento'}
+                >
+                  <SubirPliego destinoApp={destinoApp} />
+                </div>
+            </div>
           </div>
         </section>
 
