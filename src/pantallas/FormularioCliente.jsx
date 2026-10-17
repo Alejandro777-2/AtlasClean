@@ -19,7 +19,7 @@ export function EstadoIa() {
 }
 
 export default function FormularioCliente() {
-  const { desdeDocumento, formulario: f, cambiar, documento, adjuntarDocumento, quitarDocumento, generarFicha, estado, error, ficha, setVista, reiniciar, ia } = useSolicitud();
+  const { desdeDocumento, formulario: f, cambiar, documento, adjuntarDocumento, quitarDocumento, generarFicha, estado, error, ficha, setVista, reiniciar, ia, leyendoPliego } = useSolicitud();
   const [errores, setErrores] = useState({});
   const [errorDocumento, setErrorDocumento] = useState(null);
   const generando = estado === 'generando';
@@ -52,6 +52,12 @@ export default function FormularioCliente() {
         <p className="texto-suave">Las medidas reales se toman en el sitio: aquí bastan datos aproximados.</p>
         <EstadoIa />
       </div>
+
+      {leyendoPliego && documento && (
+        <Aviso tono="info" titulo={`Leyendo tu pliego: ${documento.nombre}`}>
+          {ia.configurado ? 'La IA está buscando los datos de tu lugar en el documento. Puede tardar uno o dos minutos.' : 'Preparando tu solicitud con el documento…'} Los campos que encuentre se llenarán solos; mientras tanto puedes ir completando el resto.
+        </Aviso>
+      )}
 
       {desdeDocumento.length > 0 && (
         <Aviso tono="ok" titulo={`${desdeDocumento.length} dato${desdeDocumento.length === 1 ? '' : 's'} de este formulario se llenaron con el documento`}>

@@ -34,6 +34,15 @@ export default function ProveedorSolicitud({ children }) {
   const [estado, setEstado] = useState('inactivo'); // inactivo | generando | error
   const [error, setError] = useState(null);
   const [ia, setIa] = useState({ cargando: true, configurado: false, modelo: null, agente: null });
+  // Pliego subido desde la landing que la IA está leyendo (para avisarlo en el formulario).
+  const [leyendoPliego, setLeyendoPliego] = useState(false);
+
+  // Último formulario: lo que la IA encuentra en el documento se aplica sobre lo que la persona tenga AHORA,
+  // aunque haya escrito mientras la IA leía.
+  const ultimoFormulario = useRef(formulario);
+  useEffect(() => {
+    ultimoFormulario.current = formulario;
+  }, [formulario]);
 
   // Cambios que llegan de otra ventana (p. ej. el registro abierto aparte): se aplican sin volver a guardarlos.
   const desdeOtraVentana = useRef(false);
@@ -79,31 +88,40 @@ export default function ProveedorSolicitud({ children }) {
   }, []);
   const cambiarVarios = useCallback((cambios) => setFormulario((f) => ({ ...f, ...cambios })), []);
 
+  /** Valida y lee el archivo. Devuelve { doc } o { error }. */
+  const leerDocumento = async (archivo) => {
+    const tipo = archivo.type || (archivo.name.toLowerCase().endsWith('.txt') ? 'text/plain' : '');
+    if (!DOCUMENTO.tiposMime.includes(tipo)) return { error: 'Solo se pueden analizar archivos PDF o de texto (.txt).' };
+    if (archivo.size > DOCUMENTO.limiteMb * 1024 * 1024) return { error: `El archivo supera los ${DOCUMENTO.limiteMb} MB.` };
+    try {
+      return { doc: { nombre: archivo.name, tamano: archivo.size, mediaType: tipo, base64: await leerArchivoBase64(archivo) } };
+    } catch (e) {
+      return { error: e.message };
+    }
+  };
+
   /** Devuelve un mensaje de error o null si el archivo se adjuntó. */
   const adjuntarDocumento = useCallback(async (archivo) => {
     if (!archivo) return null;
-    const tipo = archivo.type || (archivo.name.toLowerCase().endsWith('.txt') ? 'text/plain' : '');
-    if (!DOCUMENTO.tiposMime.includes(tipo)) return 'Solo se pueden analizar archivos PDF o de texto (.txt).';
-    if (archivo.size > DOCUMENTO.limiteMb * 1024 * 1024) return `El archivo supera los ${DOCUMENTO.limiteMb} MB.`;
-    try {
-      const base64 = await leerArchivoBase64(archivo);
-      setDocumento({ nombre: archivo.name, tamano: archivo.size, mediaType: tipo, base64 });
-      return null;
-    } catch (e) {
-      return e.message;
-    }
+    const { doc, error: e } = await leerDocumento(archivo);
+    if (doc) setDocumento(doc);
+    return e ?? null;
   }, []);
 
   const quitarDocumento = useCallback(() => setDocumento(null), []);
 
+  /**
+   * Genera la ficha. Opciones: modo ('demo'), doc (documento recién leído, antes de que el estado se actualice)
+   * y vistaFinal (a qué pestaña ir al terminar; por defecto la ficha).
+   */
   const generarFicha = useCallback(
-    async ({ modo } = {}) => {
+    async ({ modo, doc = documento, vistaFinal = 'ficha' } = {}) => {
       setEstado('generando');
       setError(null);
       try {
         const cuerpo = {
-          solicitud: aSolicitud(formulario),
-          documento: documento?.base64 ? { nombre: documento.nombre, mediaType: documento.mediaType, base64: documento.base64 } : null,
+          solicitud: aSolicitud(ultimoFormulario.current),
+          documento: doc?.base64 ? { nombre: doc.nombre, mediaType: doc.mediaType, base64: doc.base64 } : null,
           modo
         };
         const r = await fetch('/api/asistente-visita', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo) });
@@ -111,13 +129,14 @@ export default function ProveedorSolicitud({ children }) {
         if (!r.ok) throw new Error(datos.error ?? `Error ${r.status} al generar la ficha.`);
         setFicha(datos.ficha);
         // Completa los campos vacíos del formulario con lo que la IA encontró en el documento.
-        const { formulario: completado, aplicados } = aplicarDesdeDocumento(formulario, datos.ficha.formularioDesdeDocumento ?? []);
+        const actual = ultimoFormulario.current;
+        const { formulario: completado, aplicados } = aplicarDesdeDocumento(actual, datos.ficha.formularioDesdeDocumento ?? []);
         setDesdeDocumento(aplicados);
-        setFormularioAntes(aplicados.length ? formulario : null);
+        setFormularioAntes(aplicados.length ? actual : null);
         if (aplicados.length) setFormulario(completado);
         setMeta({ ...datos.meta, generada: new Date().toISOString(), conDocumento: Boolean(cuerpo.documento) });
         setVerificados([]);
-        setVista('ficha');
+        setVista(vistaFinal);
         setEstado('inactivo');
         return true;
       } catch (e) {
@@ -126,7 +145,26 @@ export default function ProveedorSolicitud({ children }) {
         return false;
       }
     },
-    [formulario, documento]
+    [documento]
+  );
+
+  /**
+   * Pliego subido desde la landing: se adjunta a la solicitud y la IA lo lee para llenar los campos vacíos del
+   * formulario. Se queda en el formulario para que el cliente revise y complete lo que falte.
+   * Devuelve un mensaje de error (archivo no válido) o null.
+   */
+  const leerPliegoDesdeLanding = useCallback(
+    async (archivo) => {
+      if (!archivo) return null;
+      const { doc, error: e } = await leerDocumento(archivo);
+      if (!doc) return e;
+      setDocumento(doc);
+      setVista('formulario');
+      setLeyendoPliego(true);
+      generarFicha({ doc, vistaFinal: 'formulario' }).finally(() => setLeyendoPliego(false));
+      return null;
+    },
+    [generarFicha]
   );
 
   const alternarVerificado = useCallback((indice) => setVerificados((v) => (v.includes(indice) ? v.filter((i) => i !== indice) : [...v, indice])), []);
@@ -157,6 +195,8 @@ export default function ProveedorSolicitud({ children }) {
     documento,
     adjuntarDocumento,
     quitarDocumento,
+    leerPliegoDesdeLanding,
+    leyendoPliego,
     ficha,
     meta,
     verificados,

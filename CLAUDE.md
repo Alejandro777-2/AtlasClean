@@ -23,6 +23,7 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 
 ### Módulo del cliente (antes de la visita)
 - Entrada del cliente: en la landing, tarjeta «Cotizar» → «Continuar». Lleva a `#/cliente/visita/formulario` con la empresa, el tipo de sitio y el turno de la tarjeta ya puestos (traducción en `DESDE_LANDING` de `src/config/opciones.js`).
+- Pestaña «Subir pliego con IA» de la tarjeta: el pliego (PDF o TXT) se adjunta a la solicitud y lleva al mismo formulario; la IA lo lee ahí (`leerPliegoDesdeLanding` en `ProveedorSolicitud`) y llena solo los campos vacíos, sin pisar lo que el cliente escriba mientras tanto. También se envía, sin esperar, al backend de análisis para la plataforma del equipo.
 - `src/pantallas/EspacioCliente.jsx`: espacio del cliente sin login, con la misma distribución que la plataforma: su solicitud, el registro y «Tu cotización paso a paso» (los 6 pasos en versión cliente, `src/pantallas/PasoCliente.jsx`, textos en `PASOS_CLIENTE` de `src/pasos.js`). Nunca muestra costos internos, sueldos ni márgenes: los componentes compartidos reciben `paraCliente`. `src/estado/rutas.js` hace que los enlaces del módulo se queden en el espacio en que está la persona (`#/cliente` o `#/app`).
 - `src/pantallas/ContenidoCliente.jsx`: lo que la plataforma muestra en `#/app/visita` y `#/app/registro` (grupo «Antes de la visita» de la barra lateral).
 - `src/pantallas/AsistenteVisita.jsx`: pestañas `FormularioCliente` y `FichaVisita`.

@@ -2,7 +2,7 @@
 import { AtlasLogo, Boton, Campo, Pestanas } from '../components/ui.jsx';
 import ComoFunciona from './ComoFunciona.jsx';
 import { useSolicitud } from '../estado/contexto.js';
-import { DESDE_LANDING } from '../config/opciones.js';
+import { DESDE_LANDING, DOCUMENTO } from '../config/opciones.js';
 
 const MODOS = [
   { valor: 'formulario', etiqueta: 'Llenar requisitos' },
@@ -58,12 +58,12 @@ const GRUPOS = [
 export default function Portada({ sesion }) {
   const [modo, setModo] = useState('formulario');
   const [archivo, setArchivo] = useState(null);
-  const [analizando, setAnalizando] = useState(false);
+  const [errorArchivo, setErrorArchivo] = useState(null);
 
   // «Continuar» de la tarjeta Cotizar: lleva al formulario completo del cliente (sin login)
   // con lo que ya escribió en la tarjeta, para no repetirlo.
   const formularioTarjeta = useRef(null);
-  const { cambiarVarios, setVista } = useSolicitud();
+  const { cambiarVarios, setVista, leerPliegoDesdeLanding } = useSolicitud();
   const irAlFormularioCliente = (e) => {
     e?.preventDefault();
     const datos = formularioTarjeta.current ? new FormData(formularioTarjeta.current) : null;
@@ -78,28 +78,25 @@ export default function Portada({ sesion }) {
     window.location.hash = '#/cliente/visita/formulario';
   };
 
-  // Con sesión se entra directo a la plataforma; sin sesión, al login.
+  // Con sesión se entra directo a la plataforma; sin sesión, al login (botón «Ingresar»).
   const destinoApp = sesion ? '#/app/requisitos' : '#/login';
 
-  // Envía el pliego al backend (/api, proxy de Vite) y pasa a la plataforma con o sin resultado.
+  // «Subir pliego con IA»: el pliego se adjunta a la solicitud del cliente y lleva al mismo formulario (sin login),
+  // donde la IA lo lee y llena los campos vacíos. El cliente revisa y completa lo que falte.
   const subirDocumento = async (file) => {
     if (!file) return;
     setArchivo(file.name);
-    setAnalizando(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const resp = await fetch('/api/analizar-documento', { method: 'POST', body: formData });
-      if (resp.ok) {
-        const json = await resp.json();
-        if (json.datos) sessionStorage.setItem('atlas_datos_ia_precargados', JSON.stringify(json.datos));
-      }
-    } catch (e) {
-      console.warn('Error analizando documento en portada:', e);
-    } finally {
-      setAnalizando(false);
-      window.location.hash = destinoApp;
-    }
+    const mensaje = await leerPliegoDesdeLanding(file);
+    setErrorArchivo(mensaje);
+    if (mensaje) return;
+    // Copia para la plataforma del equipo (backend de análisis): si no está corriendo, no pasa nada.
+    const formData = new FormData();
+    formData.append('file', file);
+    fetch('/api/analizar-documento', { method: 'POST', body: formData })
+      .then((resp) => (resp.ok ? resp.json() : null))
+      .then((json) => json?.datos && sessionStorage.setItem('atlas_datos_ia_precargados', JSON.stringify(json.datos)))
+      .catch(() => {});
+    window.location.hash = '#/cliente/visita/formulario';
   };
 
   // Pausa las animaciones del fondo cuando el hero sale de pantalla (ahorra batería).
@@ -214,13 +211,14 @@ export default function Portada({ sesion }) {
                 <div className="intake__cuerpo">
                   <div>
                     <h2>Sube el pliego o requerimiento</h2>
-                    <p className="texto-suave">PDF, Word o TXT. La IA extraerá metraje, riesgo y personal sugerido.</p>
+                    <p className="texto-suave">PDF o TXT, hasta {DOCUMENTO.limiteMb} MB. La IA lo lee y llena tu formulario con lo que encuentre.</p>
                   </div>
                   <label className="subida">
-                    <input type="file" className="visualmente-oculto" accept=".pdf,.doc,.docx,.txt" onChange={(e) => subirDocumento(e.target.files[0])} />
-                    <strong>{archivo ?? 'Elige un pliego o TDR (PDF/Word)'}</strong>
-                    <span className="texto-suave">{analizando ? 'Analizando pliego…' : 'Haz clic para seleccionarlo'}</span>
-                  </label>                </div>
+                    <input type="file" className="visualmente-oculto" accept={DOCUMENTO.tiposAceptados} onChange={(e) => subirDocumento(e.target.files[0])} />
+                    <strong>{archivo ?? 'Elige un pliego o TDR (PDF o TXT)'}</strong>
+                    <span className="texto-suave">Haz clic para seleccionarlo</span>
+                  </label>
+                  {errorArchivo && <span className="campo__error">{errorArchivo}</span>}                </div>
               )}
           </div>
         </section>
