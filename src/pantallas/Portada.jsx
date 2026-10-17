@@ -2,6 +2,7 @@
 import { AtlasLogo, Boton, Campo, Ola } from '../components/ui.jsx';
 import ComoFunciona from './ComoFunciona.jsx';
 import SubirPliego from './SubirPliego.jsx';
+import Planes from './Planes.jsx';
 
 // Dos formas de empezar la cotización (pestañas con forma de tarjeta).
 const MODOS = [
@@ -369,6 +370,7 @@ export default function Portada({ sesion }) {
         </section>
 
         <ComoFunciona />
+        <Planes />
       </main>
 
       <footer className="portada-pie">Expo Clean Ecuador 2026</footer>

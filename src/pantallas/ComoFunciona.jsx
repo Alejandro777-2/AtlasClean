@@ -198,6 +198,8 @@ export default function ComoFunciona() {
           </div>
         )}
       </div>
+      {/* Salida hacia "Planes" (beige): la curva se dibuja sobre el azul, como la de entrada. */}
+      <Ola lado="abajo" color="var(--crema)" colorMedio="var(--ola-medio)" />
     </section>
   );
 }
