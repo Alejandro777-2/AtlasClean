@@ -6,6 +6,39 @@ import { useId } from 'react';
 
 const cx = (...c) => c.filter(Boolean).join(' ');
 
+/**
+ * Divisor ondulado entre secciones (decorativo), con el borde difuminado. Se estira al 100 % del
+ * ancho con altura fija (--ola en App.css). `lado`: 'abajo' rellena la parte inferior (va al pie
+ * de una sección), 'arriba' la superior (va al inicio). `color`: el fondo de la sección vecina.
+ * `colorMedio`: una segunda ola, algo adelantada y más difuminada, que pone un tono intermedio
+ * (azul claro) en el borde para que el paso no pase por un gris turbio.
+ * Las formas se salen del viewBox por los lados y por el extremo lleno: así el desenfoque solo se
+ * nota en la curva y no deja bordes transparentes.
+ */
+// viewBox de 1440×200 estirado a la altura de --ola. La curva va por el centro (y≈60–140) para que
+// el desenfoque (σ 20 en el borde, 28 en el tono medio) se apague antes de los bordes del SVG.
+const OLAS = {
+  abajo: (dy) => `M-240,${110 - dy} C120,${140 - dy} 480,${140 - dy} 720,${108 - dy} C960,${76 - dy} 1260,${72 - dy} 1680,${98 - dy} L1680,500 L-240,500 Z`,
+  arriba: (dy) => `M-240,-300 L1680,-300 L1680,${90 + dy} C1260,${124 + dy} 960,${120 + dy} 720,${88 + dy} C480,${56 + dy} 120,${52 + dy} -240,${88 + dy} Z`
+};
+export function Ola({ lado = 'abajo', color, colorMedio, className }) {
+  const id = useId();
+  return (
+    <svg className={cx('ola', `ola--${lado}`, className)} viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <defs>
+        <filter id={`${id}-medio`} x="-10%" y="-60%" width="120%" height="220%">
+          <feGaussianBlur stdDeviation="28" />
+        </filter>
+        <filter id={`${id}-borde`} x="-10%" y="-60%" width="120%" height="220%">
+          <feGaussianBlur stdDeviation="20" />
+        </filter>
+      </defs>
+      {colorMedio && <path d={OLAS[lado](16)} style={{ fill: colorMedio }} filter={`url(#${id}-medio)`} />}
+      <path d={OLAS[lado](0)} style={{ fill: color }} filter={`url(#${id}-borde)`} />
+    </svg>
+  );
+}
+
 /** Logotipo de Atlas en SVG (sin dependencias). Letras blancas: pensado para fondo marino. */
 export function AtlasLogo({ height = 44, letters = '#FFFFFF', orb = '#3DC8FF', glow = true, className = 'logo', title = 'Atlas' }) {
   return (
@@ -75,6 +108,10 @@ export function Campo({ etiqueta, ayuda, error, opcional, children }) {
       {children(id, accesible)}
       {error ? (
         <span className="campo__error" id={idError}>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7.5v5M12 16.5h0" />
+          </svg>
           {error}
         </span>
       ) : (
