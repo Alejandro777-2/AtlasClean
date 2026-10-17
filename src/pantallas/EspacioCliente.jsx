@@ -1,24 +1,31 @@
 /**
  * ESPACIO DEL CLIENTE (#/cliente/<sección>), sin login.
- * Se entra desde la landing (tarjeta «Cotizar» → «Formulario completo para tu visita»).
+ * Se entra desde la landing (tarjeta «Cotizar» → «Continuar»).
  * Usa la misma distribución que la plataforma (barra lateral marino + barra superior + contenido),
- * pero solo con lo que el cliente necesita: formulario y ficha (IA), registro y presupuesto previo con contacto.
- * Los pasos internos del cotizador quedan en la plataforma del equipo (#/app, con login).
+ * pero solo con lo que el cliente necesita: su solicitud (formulario y ficha con IA), el registro de sus datos
+ * y los 6 pasos de su cotización en versión para el cliente (sin costos internos ni márgenes).
+ * El cotizador completo queda en la plataforma del equipo (#/app, con login).
  */
 import { useEffect } from 'react';
 import { AtlasLogo } from '../components/ui.jsx';
+import { PASOS_CLIENTE } from '../pasos.js';
 import { useSolicitud } from '../estado/contexto.js';
 import ContenidoCliente, { EstadoFicha } from './ContenidoCliente.jsx';
-import PasoCostos from './PasoCostos.jsx';
+import PasoCliente from './PasoCliente.jsx';
 
-const SECCIONES_ESPACIO_CLIENTE = [
+const SECCIONES_SOLICITUD = [
   { id: 'visita', nombre: 'Tu solicitud', icono: 'IA', descripcion: 'Describe el lugar y, si tienes, sube tu pliego. El asistente prepara la visita técnica.' },
-  { id: 'registro', nombre: 'Registro de tus datos', icono: '≡', descripcion: 'Todos los datos que nos diste, con su estado. Se actualiza solo al editar el formulario.' },
-  { id: 'presupuesto', nombre: 'Presupuesto previo', icono: '$', descripcion: 'Un rango orientativo del costo mensual y cómo contactarnos. La cotización final se hace tras la visita.' }
+  { id: 'registro', nombre: 'Registro de tus datos', icono: '≡', descripcion: 'Todos los datos que nos diste, con su estado. Se actualiza solo al editar el formulario.' }
 ];
 
+// Enlaces antiguos: #/cliente/presupuesto es ahora el paso «Cotización previa» (costos).
+const ALIAS = { presupuesto: 'costos' };
+
 export default function EspacioCliente({ seccion }) {
-  const actual = SECCIONES_ESPACIO_CLIENTE.find((s) => s.id === seccion) ?? SECCIONES_ESPACIO_CLIENTE[0];
+  const id = ALIAS[seccion] ?? seccion;
+  const indicePaso = PASOS_CLIENTE.findIndex((p) => p.id === id);
+  const paso = indicePaso >= 0 ? PASOS_CLIENTE[indicePaso] : null;
+  const actual = paso ?? SECCIONES_SOLICITUD.find((s) => s.id === id) ?? SECCIONES_SOLICITUD[0];
   const { vista } = useSolicitud();
 
   useEffect(() => {
@@ -31,20 +38,35 @@ export default function EspacioCliente({ seccion }) {
         <a href="#/" className="lateral__marca" aria-label="Atlas, volver a la portada">
           <AtlasLogo height={32} />
         </a>
-        <nav aria-label="Tu solicitud">
-          <p className="lateral__rotulo">Tu solicitud</p>
-          <ol className="lateral__pasos">
-            {SECCIONES_ESPACIO_CLIENTE.map((s) => (
-              <li key={s.id}>
-                <a href={`#/cliente/${s.id}`} className="lateral__paso" aria-current={s.id === actual.id ? 'page' : undefined}>
-                  <span className="lateral__num lateral__num--ia" aria-hidden="true">
-                    {s.icono}
-                  </span>
-                  {s.nombre}
-                </a>
-              </li>
-            ))}
-          </ol>
+        <nav className="lateral__nav" aria-label="Tu espacio">
+          <div className="lateral__grupo">
+            <p className="lateral__rotulo">Tu solicitud</p>
+            <ol className="lateral__pasos">
+              {SECCIONES_SOLICITUD.map((s) => (
+                <li key={s.id}>
+                  <a href={`#/cliente/${s.id}`} className="lateral__paso" aria-current={s.id === actual.id ? 'page' : undefined}>
+                    <span className="lateral__num lateral__num--ia" aria-hidden="true">
+                      {s.icono}
+                    </span>
+                    {s.nombre}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="lateral__grupo">
+            <p className="lateral__rotulo">Tu cotización paso a paso</p>
+            <ol className="lateral__pasos">
+              {PASOS_CLIENTE.map((p, i) => (
+                <li key={p.id}>
+                  <a href={`#/cliente/${p.id}`} className="lateral__paso" aria-current={p.id === actual.id ? 'page' : undefined}>
+                    <span className="lateral__num">{i + 1}</span>
+                    {p.nombre}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
         </nav>
         <div className="lateral__pie">
           <a href="#/" className="lateral__volver">
@@ -58,7 +80,7 @@ export default function EspacioCliente({ seccion }) {
 
       <header className="superior">
         <div>
-          <p className="antetitulo">Antes de la visita · Atlas</p>
+          <p className="antetitulo">{paso ? `Paso ${indicePaso + 1} de ${PASOS_CLIENTE.length} · Tu cotización` : 'Antes de la visita · Atlas'}</p>
           <h1>{actual.nombre}</h1>
           <p className="superior__desc">{actual.descripcion}</p>
         </div>
@@ -66,11 +88,9 @@ export default function EspacioCliente({ seccion }) {
       </header>
 
       <main className="contenido">
-        {actual.id === 'presupuesto' ? (
-          <section className="panel aportes-ficha">
-            <h2>Presupuesto previo</h2>
-            <p className="panel__desc">Calculado con los datos de tu solicitud. Es una orientación: el valor final se define después de la visita técnica.</p>
-            <PasoCostos />
+        {paso ? (
+          <section className="panel aportes-ficha" aria-label={paso.nombre}>
+            <PasoCliente paso={paso} />
           </section>
         ) : (
           <ContenidoCliente seccion={actual.id} />

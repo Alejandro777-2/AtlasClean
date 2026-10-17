@@ -11,7 +11,7 @@ import { rutaModulo } from '../estado/rutas.js';
 
 const TONO_RIESGO = (r) => (r >= 5 ? 'error' : r >= 3 ? 'aviso' : 'info');
 
-export default function PasoRequisitos() {
+export default function PasoRequisitos({ paraCliente = false }) {
   const { ficha, setVista } = useSolicitud();
   const abrir = (vista) => () => setVista(vista);
 
@@ -19,14 +19,16 @@ export default function PasoRequisitos() {
     return (
       <Aviso
         tono="info"
-        titulo="Primero prepara la visita"
+        titulo={paraCliente ? 'Primero cuéntanos de tu lugar' : 'Primero prepara la visita'}
         acciones={
           <Boton variante="primario" href={rutaModulo('visita')} onClick={abrir('formulario')}>
-            Ir al asistente de visita
+            {paraCliente ? 'Ir a tu solicitud' : 'Ir al asistente de visita'}
           </Boton>
         }
       >
-        Llena el formulario del cliente en el Asistente de visita. La ficha que genera es el punto de partida de este paso.
+        {paraCliente
+          ? 'Llena el formulario de tu solicitud (y, si tienes, sube tu pliego). Con eso verás aquí las zonas de tu lugar.'
+          : 'Llena el formulario del cliente en el Asistente de visita. La ficha que genera es el punto de partida de este paso.'}
       </Aviso>
     );
   }
@@ -36,14 +38,16 @@ export default function PasoRequisitos() {
     <div className="ficha">
       <Aviso
         tono="aviso"
-        titulo="Punto de partida: supuestos de la ficha de visita"
+        titulo={paraCliente ? 'Así entendimos tu lugar' : 'Punto de partida: supuestos de la ficha de visita'}
         acciones={
           <Boton variante="secundario" href={rutaModulo('visita')} onClick={abrir('ficha')}>
-            Ver la ficha completa
+            {paraCliente ? 'Ver tu ficha de visita' : 'Ver la ficha completa'}
           </Boton>
         }
       >
-        Se confirman con las medidas reales que tome el técnico en el sitio.
+        {paraCliente
+          ? 'Son estimaciones a partir de tus datos. El técnico las confirma con medidas reales en la visita.'
+          : 'Se confirman con las medidas reales que tome el técnico en el sitio.'}
       </Aviso>
       <Tabla
         columnas={[

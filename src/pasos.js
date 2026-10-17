@@ -60,3 +60,42 @@ export const REGISTRO = {
 
 // Secciones del módulo del cliente en la barra lateral («Antes de la visita»).
 export const SECCIONES_CLIENTE = [VISITA, REGISTRO];
+
+// Los 6 pasos tal como los ve el CLIENTE en su espacio (#/cliente/<paso>): qué incluye cada parte de su servicio,
+// sin costos internos ni márgenes. El cálculo real lo hace el equipo después de la visita.
+export const PASOS_CLIENTE = [
+  {
+    id: 'requisitos',
+    nombre: 'Requisitos',
+    descripcion: 'Las zonas de tu lugar con sus m² y el nivel de limpieza que necesita cada una.',
+    incluye: ['Tipo de sitio y turnos de trabajo', 'Zonas con sus m², riesgo y tráfico', 'Protocolo de limpieza por zona']
+  },
+  {
+    id: 'personal',
+    nombre: 'Personal',
+    descripcion: 'El equipo de limpieza que atenderá tu lugar. La cantidad exacta se confirma en la visita.',
+    incluye: ['Personal según tus turnos y horarios', 'Supervisión del servicio', 'Personal con sueldos y afiliación de ley']
+  },
+  {
+    id: 'insumos',
+    nombre: 'Insumos',
+    descripcion: 'Los productos de limpieza que usaremos, según el tipo de zona y el protocolo.',
+    incluye: ['Productos adecuados para cada zona', 'Desinfección donde el protocolo lo exige', 'Reposición durante el mes']
+  },
+  {
+    id: 'equipos',
+    nombre: 'Equipos',
+    descripcion: 'La maquinaria y la protección del personal que requiere tu lugar.',
+    incluye: ['Maquinaria según el tamaño y el tipo de piso', 'Protección del personal (EPP)', 'Mantenimiento de los equipos a nuestro cargo']
+  },
+  {
+    id: 'costos',
+    nombre: 'Cotización previa',
+    descripcion: 'Un rango orientativo del costo mensual y cómo contactarnos. La cotización final se hace tras la visita.'
+  },
+  {
+    id: 'propuesta',
+    nombre: 'Propuesta',
+    descripcion: 'En qué etapa está tu solicitud y qué sigue hasta recibir la propuesta formal.'
+  }
+];

@@ -53,9 +53,21 @@ export function TablaRequisitosPliego({ ficha }) {
 }
 
 /** Contenido de los pasos 2 a 6: lo que pide el pliego para ese módulo. */
-export function RequisitosModulo({ modulo }) {
+export function RequisitosModulo({ modulo, paraCliente = false }) {
   const { ficha, meta, setVista } = useSolicitud();
   const r = requisitoDe(ficha, modulo);
+
+  // En el espacio del cliente solo se muestra si su pliego pide algo; sin pliego no hay nada que avisar.
+  if (paraCliente) {
+    if (!r) return null;
+    return (
+      <section className="ficha__seccion">
+        <h3>Lo que pide tu pliego</h3>
+        <p className="texto-suave">Lo tomamos en cuenta para la cotización: {r.resumen}.</p>
+        {r.detalles.length > 0 && <Tabla columnas={COLUMNAS} filas={filas(r.detalles)} />}
+      </section>
+    );
+  }
 
   if (!ficha) {
     return (

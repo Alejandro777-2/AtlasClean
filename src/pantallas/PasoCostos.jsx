@@ -77,7 +77,10 @@ export function Contactanos() {
   );
 }
 
-export default function PasoCostos() {
+// En el espacio del cliente no se muestran los porcentajes internos (gastos administrativos y utilidad).
+const paraElCliente = (d) => (d.id === 'gastos' ? { ...d, concepto: 'Gestión y administración del servicio', detalle: 'Coordinación, seguimiento y respaldo de la empresa' } : d);
+
+export default function PasoCostos({ paraCliente = false }) {
   const { ficha, formulario, setVista } = useSolicitud();
   const est = estimarPresupuesto(ficha, formulario);
   const pliego = requisitoDe(ficha, 'costos');
@@ -90,11 +93,11 @@ export default function PasoCostos() {
           titulo="Aún no se puede estimar un presupuesto previo"
           acciones={
             <Boton variante="primario" href={rutaModulo('visita')} onClick={() => setVista('formulario')}>
-              Ir al asistente de visita
+              {paraCliente ? 'Ir a tu solicitud' : 'Ir al asistente de visita'}
             </Boton>
           }
         >
-          {est.motivo} Con la ficha de visita (tamaño, zonas y turnos) se calcula un rango orientativo para el cliente.
+          {est.motivo} {paraCliente ? 'Con los datos de tu solicitud (tamaño, zonas y turnos) calculamos un rango orientativo.' : 'Con la ficha de visita (tamaño, zonas y turnos) se calcula un rango orientativo para el cliente.'}
         </Aviso>
         <Contactanos />
       </div>
@@ -143,7 +146,7 @@ export default function PasoCostos() {
             { clave: 'detalle', titulo: 'Detalle' },
             { clave: 'rango', titulo: 'Rango mensual', numerica: true }
           ]}
-          filas={est.desglose.map((d) => ({ id: d.id, concepto: <strong>{d.concepto}</strong>, detalle: <span className="texto-suave">{d.detalle}</span>, rango: textoRango(d) }))}
+          filas={(paraCliente ? est.desglose.map(paraElCliente) : est.desglose).map((d) => ({ id: d.id, concepto: <strong>{d.concepto}</strong>, detalle: <span className="texto-suave">{d.detalle}</span>, rango: textoRango(d) }))}
         />
       </section>
 
@@ -156,7 +159,7 @@ export default function PasoCostos() {
         </ul>
       </section>
 
-      {pliego && (
+      {pliego && !paraCliente && (
         <div className="solo-pantalla">
           <Aviso tono="info" titulo="Uso interno · referencia del pliego (no se imprime)">
             {pliego.resumen}
@@ -167,10 +170,10 @@ export default function PasoCostos() {
 
       <div className="presupuesto__acciones solo-pantalla">
         <Boton variante="primario" onClick={imprimirPresupuesto}>
-          Imprimir presupuesto para el cliente
+          {paraCliente ? 'Imprimir mi presupuesto previo' : 'Imprimir presupuesto para el cliente'}
         </Boton>
         <Boton variante="secundario" href={rutaModulo('visita')} onClick={() => setVista('ficha')}>
-          Ver la ficha de visita
+          {paraCliente ? 'Ver tu ficha de visita' : 'Ver la ficha de visita'}
         </Boton>
       </div>
 

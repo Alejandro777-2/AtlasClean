@@ -5,8 +5,8 @@
 
 export const enEspacioCliente = () => typeof window !== 'undefined' && window.location.hash.startsWith('#/cliente');
 
-/** seccion: 'visita' | 'registro' | 'costos' (en el espacio del cliente, costos es «presupuesto»). */
+/** seccion: 'visita' | 'registro' | id de un paso ('requisitos' … 'propuesta'). */
 export function rutaModulo(seccion) {
-  if (enEspacioCliente()) return `#/cliente/${seccion === 'costos' ? 'presupuesto' : seccion}`;
+  if (enEspacioCliente()) return `#/cliente/${seccion}`;
   return `#/app/${seccion}`;
 }
