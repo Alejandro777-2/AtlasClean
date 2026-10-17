@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Solicitudes de clientes (datos personales): se quedan en la computadora, nunca a git
+registros/

@@ -29,6 +29,7 @@ export function leerBorrador() {
       verificados: ficha && Array.isArray(g.verificados) ? g.verificados.filter(Number.isInteger) : [],
       desdeDocumento: Array.isArray(g.desdeDocumento) ? g.desdeDocumento.filter((d) => esObjeto(d) && typeof d.campo === 'string') : [],
       documentoNombre: typeof g.documentoNombre === 'string' ? g.documentoNombre : null,
+      idSolicitud: typeof g.idSolicitud === 'string' && /^SOL-[\w-]{4,40}$/.test(g.idSolicitud) ? g.idSolicitud : null,
       documentoTamano: Number.isFinite(g.documentoTamano) ? g.documentoTamano : null
     };
   } catch {

@@ -3,6 +3,8 @@
  *
  *   GET  /api/asistente-visita/estado  → si hay IA configurada (nunca devuelve la clave)
  *   POST /api/asistente-visita         → { solicitud, documento?, modo? } → { ficha, meta }
+ *   POST /api/asistente-visita/registro → { id, formulario, desdeDocumento?, documentoNombre?, fichaEstado? }
+ *        → guarda la solicitud como una fila del Excel de plantilla (server/registroExcel.js)
  *
  * - El prompt sale del archivo del agente (agentes/…/asistente-de-visita-atlas.md): una sola fuente.
  * - La clave va en el archivo .env (ANTHROPIC_API_KEY), que no se sube a git. Nunca llega al navegador.
@@ -12,6 +14,7 @@
 import { leerAgente } from './agente.js';
 import { ESQUEMA_FICHA, normalizarFicha } from './esquemaFicha.js';
 import { generarFichaDemo } from './fichaDemo.js';
+import { guardarSolicitud, rutaExcel } from './registroExcel.js';
 
 const LIMITE_CUERPO = 16 * 1024 * 1024; // ~10 MB de PDF en base64
 const LIMITE_TEXTO_DOCUMENTO = 120000;
@@ -210,8 +213,11 @@ function validarEntrada(cuerpo) {
   }
 }
 
-/** @param {Record<string,string>} env variables del .env (ANTHROPIC_API_KEY, ATLAS_MODELO_IA) */
-export function crearManejadorAsistente(env = {}) {
+/**
+ * @param {Record<string,string>} env variables del .env (ANTHROPIC_API_KEY, ATLAS_MODELO_IA, ATLAS_EXCEL_SOLICITUDES)
+ * @param {string} raiz carpeta del proyecto (donde se crea el Excel de solicitudes)
+ */
+export function crearManejadorAsistente(env = {}, raiz = process.cwd()) {
   const clave = (env.ANTHROPIC_API_KEY ?? '').trim();
 
   return async function manejador(req, res, next) {
@@ -223,6 +229,19 @@ export function crearManejadorAsistente(env = {}) {
         return responder(res, 200, { configurado: Boolean(clave), agente: agente.nombre, modelo: env.ATLAS_MODELO_IA?.trim() || agente.modelo });
       } catch (e) {
         return responder(res, 200, { configurado: false, agente: null, modelo: null, error: e.message });
+      }
+    }
+
+    if (ruta === '/api/asistente-visita/registro' && req.method === 'POST') {
+      try {
+        const cuerpo = await leerJson(req);
+        if (!cuerpo?.id || typeof cuerpo.id !== 'string' || !cuerpo.formulario || typeof cuerpo.formulario !== 'object') throw errorHttp('Faltan el id o el formulario.', 400);
+        const resultado = await guardarSolicitud(cuerpo, { archivo: rutaExcel(env, raiz) });
+        if (resultado.ok) console.log(`[atlas] Solicitud ${cuerpo.id} guardada en ${resultado.archivo} (fila ${resultado.fila}).`);
+        else console.warn(`[atlas] ${resultado.error} (${resultado.archivo})`);
+        return responder(res, resultado.ok ? 200 : 202, resultado);
+      } catch (e) {
+        return responder(res, e.estado ?? 500, { ok: false, error: e.message });
       }
     }
 
@@ -271,8 +290,8 @@ export function crearManejadorAsistente(env = {}) {
 }
 
 /** Plugin de Vite: monta la API en el servidor de desarrollo y en vista previa. */
-export function asistenteVisita(env) {
-  const manejador = crearManejadorAsistente(env);
+export function asistenteVisita(env, raiz) {
+  const manejador = crearManejadorAsistente(env, raiz);
   return {
     name: 'atlas-asistente-visita',
     configureServer(servidor) {

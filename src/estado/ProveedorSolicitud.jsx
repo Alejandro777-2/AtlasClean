@@ -9,6 +9,27 @@ import { DOCUMENTO } from '../config/opciones.js';
 import { CLAVE_BORRADOR, guardarBorrador, leerBorrador } from './borrador.js';
 import { aplicarDesdeDocumento } from '../formulario/desdeDocumento.js';
 
+/** ID de la solicitud (una fila del Excel de solicitudes): SOL-AAAAMMDD-XXXX. */
+function nuevoIdSolicitud() {
+  const d = new Date();
+  const dia = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  const azar = (globalThis.crypto?.randomUUID?.() ?? String(Math.random()).slice(2)).replace(/-/g, '').slice(0, 6).toUpperCase();
+  return `SOL-${dia}-${azar}`;
+}
+
+/**
+ * Guarda la solicitud como una fila del Excel de plantilla (server/registroExcel.js). No bloquea al cliente:
+ * si falla (servidor apagado, Excel abierto), solo se avisa en la consola; el servidor deja la fila en espera.
+ */
+function registrarEnExcel(datos) {
+  return fetch('/api/asistente-visita/registro', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) })
+    .then((r) => r.json().catch(() => ({})))
+    .then((r) => {
+      if (!r.ok) console.warn('[atlas] La solicitud no se guardó todavía en el Excel:', r.error ?? 'sin respuesta');
+    })
+    .catch(() => console.warn('[atlas] No se pudo guardar la solicitud en el Excel (servidor local no disponible).'));
+}
+
 function leerArchivoBase64(archivo) {
   return new Promise((resolve, reject) => {
     const lector = new FileReader();
@@ -29,6 +50,8 @@ export default function ProveedorSolicitud({ children }) {
   // Campos del formulario que se completaron con el documento (con su página). Se guarda para el registro.
   const [desdeDocumento, setDesdeDocumento] = useState(borrador.desdeDocumento ?? []);
   const [formularioAntes, setFormularioAntes] = useState(null); // para «Deshacer» (solo en esta sesión)
+  // ID de la solicitud: su fila en el Excel de solicitudes. Se conserva en el borrador; «Empezar de nuevo» crea otro.
+  const [idSolicitud, setIdSolicitud] = useState(() => borrador.idSolicitud ?? nuevoIdSolicitud());
   // "#/app/visita/formulario" (botón "Empezar una cotización") abre siempre la pestaña del formulario.
   const [vista, setVista] = useState(() => (window.location.hash.endsWith('/formulario') || !borrador.ficha ? 'formulario' : 'ficha'));
   const [estado, setEstado] = useState('inactivo'); // inactivo | generando | error
@@ -40,9 +63,11 @@ export default function ProveedorSolicitud({ children }) {
   // Último formulario: lo que la IA encuentra en el documento se aplica sobre lo que la persona tenga AHORA,
   // aunque haya escrito mientras la IA leía.
   const ultimoFormulario = useRef(formulario);
+  const ultimoDesdeDocumento = useRef(desdeDocumento);
   useEffect(() => {
     ultimoFormulario.current = formulario;
-  }, [formulario]);
+    ultimoDesdeDocumento.current = desdeDocumento;
+  }, [formulario, desdeDocumento]);
 
   // Cambios que llegan de otra ventana (p. ej. el registro abierto aparte): se aplican sin volver a guardarlos.
   const desdeOtraVentana = useRef(false);
@@ -56,6 +81,7 @@ export default function ProveedorSolicitud({ children }) {
       setMeta(b.meta ?? null);
       setVerificados(b.verificados ?? []);
       setDesdeDocumento(b.desdeDocumento ?? []);
+      if (b.idSolicitud) setIdSolicitud(b.idSolicitud);
       setDocumento((d) => (b.documentoNombre ? (d?.nombre === b.documentoNombre ? d : { nombre: b.documentoNombre, tamano: b.documentoTamano, base64: null }) : null));
     };
     window.addEventListener('storage', alCambiarOtraVentana);
@@ -67,8 +93,8 @@ export default function ProveedorSolicitud({ children }) {
       desdeOtraVentana.current = false;
       return;
     }
-    guardarBorrador({ formulario, ficha, meta, verificados, desdeDocumento, documentoNombre: documento?.nombre ?? null, documentoTamano: documento?.tamano ?? null });
-  }, [formulario, ficha, meta, verificados, documento, desdeDocumento]);
+    guardarBorrador({ formulario, ficha, meta, verificados, desdeDocumento, idSolicitud, documentoNombre: documento?.nombre ?? null, documentoTamano: documento?.tamano ?? null });
+  }, [formulario, ficha, meta, verificados, documento, desdeDocumento, idSolicitud]);
 
   useEffect(() => {
     let vigente = true;
@@ -111,11 +137,15 @@ export default function ProveedorSolicitud({ children }) {
   const quitarDocumento = useCallback(() => setDocumento(null), []);
 
   /**
-   * Genera la ficha. Opciones: modo ('demo'), doc (documento recién leído, antes de que el estado se actualice)
-   * y vistaFinal (a qué pestaña ir al terminar; por defecto la ficha).
+   * Genera la ficha. Opciones: modo ('demo'), doc (documento recién leído, antes de que el estado se actualice),
+   * vistaFinal (a qué pestaña ir al terminar; por defecto la ficha) y registrar (guardar la solicitud en el Excel;
+   * sí al pulsar «Generar ficha», no en la lectura automática del pliego subido en la landing).
+   * Lo que falte en el formulario y en el pliego queda en el Excel como «Falta dato».
    */
   const generarFicha = useCallback(
-    async ({ modo, doc = documento, vistaFinal = 'ficha' } = {}) => {
+    async ({ modo, doc = documento, vistaFinal = 'ficha', registrar = true } = {}) => {
+      const registro = (formularioFinal, aplicados, fichaEstado) =>
+        registrar && registrarEnExcel({ id: idSolicitud, formulario: formularioFinal, desdeDocumento: aplicados, documentoNombre: doc?.nombre ?? null, fichaEstado });
       setEstado('generando');
       setError(null);
       try {
@@ -131,21 +161,27 @@ export default function ProveedorSolicitud({ children }) {
         // Completa los campos vacíos del formulario con lo que la IA encontró en el documento.
         const actual = ultimoFormulario.current;
         const { formulario: completado, aplicados } = aplicarDesdeDocumento(actual, datos.ficha.formularioDesdeDocumento ?? []);
-        setDesdeDocumento(aplicados);
+        // Los datos que ya vinieron del pliego antes (y el cliente no cambió) siguen marcados como «del documento».
+        const nuevos = new Set(aplicados.map((d) => d.campo));
+        const delDocumento = [...ultimoDesdeDocumento.current.filter((d) => !nuevos.has(d.campo)), ...aplicados];
+        setDesdeDocumento(delDocumento);
         setFormularioAntes(aplicados.length ? actual : null);
         if (aplicados.length) setFormulario(completado);
         setMeta({ ...datos.meta, generada: new Date().toISOString(), conDocumento: Boolean(cuerpo.documento) });
         setVerificados([]);
         setVista(vistaFinal);
         setEstado('inactivo');
+        registro(aplicados.length ? completado : actual, delDocumento, datos.ficha.listoParaVisita ? 'Lista para agendar' : 'Faltan datos');
         return true;
       } catch (e) {
         setError(e.message === 'Failed to fetch' ? 'No hay conexión con el servidor local. Inicia la app con "npm run dev".' : e.message);
         setEstado('error');
+        // Aunque la ficha falle, los datos del cliente quedan en el Excel.
+        registro(ultimoFormulario.current, ultimoDesdeDocumento.current, 'Error al generar la ficha');
         return false;
       }
     },
-    [documento]
+    [documento, idSolicitud]
   );
 
   /**
@@ -161,7 +197,7 @@ export default function ProveedorSolicitud({ children }) {
       setDocumento(doc);
       setVista('formulario');
       setLeyendoPliego(true);
-      generarFicha({ doc, vistaFinal: 'formulario' }).finally(() => setLeyendoPliego(false));
+      generarFicha({ doc, vistaFinal: 'formulario', registrar: false }).finally(() => setLeyendoPliego(false));
       return null;
     },
     [generarFicha]
@@ -183,6 +219,7 @@ export default function ProveedorSolicitud({ children }) {
     setVerificados([]);
     setDesdeDocumento([]);
     setFormularioAntes(null);
+    setIdSolicitud(nuevoIdSolicitud());
     setVista('formulario');
     setEstado('inactivo');
     setError(null);

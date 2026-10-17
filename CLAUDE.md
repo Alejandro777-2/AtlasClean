@@ -7,7 +7,7 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 - `npm run dev`: servidor de desarrollo en http://localhost:5173
 - `npm run build`: build de producción en `dist/`
 - `npm run lint`: oxlint (config en `.oxlintrc.json`)
-- `npm test`: pruebas del servidor del asistente (`node --test`, sin llamar a la IA real) y de los cálculos de planes (`src/planes.test.js`)
+- `npm test`: pruebas del servidor del asistente (`node --test`, sin llamar a la IA real), del Excel de solicitudes y de los cálculos de planes (`src/planes.test.js`)
 
 ## Estructura
 - `src/index.css`: tokens (colores, tipografía, espacios, radios, sombras) y estilos de los componentes.
@@ -55,6 +55,14 @@ React 19 + Vite 8, JavaScript (JSX), sin TypeScript.
 - SIN PRESUPUESTO PREVIO: al cliente no se le muestra ningún precio, rango ni estimación antes de la visita (si la cotización real saliera de ese rango, generaría inconformidad). El precio llega en la propuesta formal, calculado por el motor de costos con las medidas reales.
 - «Contáctanos»: datos en `src/config/contacto.js`. Son de ejemplo (`esEjemplo: true`) hasta poner los reales.
 - «Lista para agendar» es una regla fija del servidor (tipo de lugar, dirección y contacto), no un criterio de la IA.
+
+## Excel de solicitudes (módulo del cliente)
+- Al pulsar «Generar ficha con IA» (y al volver a generar), la solicitud se guarda como UNA FILA de `registros/solicitudes_clientes.xlsx` en la carpeta del proyecto (otra ruta: `ATLAS_EXCEL_SOLICITUDES` en `.env`). Lo hace `server/registroExcel.js` (librería `exceljs`) desde `POST /api/asistente-visita/registro`. La lectura automática del pliego subido en la landing no guarda fila.
+- Columnas: ID de solicitud, fechas, pliego adjunto, estado de la ficha, cada dato del formulario (mismos nombres que `BLOQUES_REGISTRO` de `src/formulario/registro.js`), «Datos tomados del pliego» y «Observaciones de la visita (equipo)».
+- Lo que no dio el cliente ni está en su pliego queda como «Falta dato» (celda amarilla) para que el equipo lo complete en el Excel tras la visita. Lo que vino del pliego va en celeste, con una nota de la página.
+- Una solicitud = una fila (ID `SOL-AAAAMMDD-XXXXXX`, guardado en el borrador; «Empezar de nuevo» crea otro). Al volver a generar se actualiza la misma fila y no se pisan las celdas que el equipo ya completó.
+- Si el Excel está abierto (Windows lo bloquea), la fila queda en `registros/solicitudes_pendientes.jsonl` y se escribe en el siguiente guardado.
+- `registros/` tiene datos de clientes: está en `.gitignore` y nunca se sube a GitHub.
 
 ## Esquema visual y distribución (fijo)
 El aspecto y la distribución actuales son la norma para todo el proyecto. No se cambian sin aprobación explícita.

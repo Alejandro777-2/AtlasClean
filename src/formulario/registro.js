@@ -67,7 +67,7 @@ export const BLOQUES_REGISTRO = [
 ];
 
 // Campo del formulario que muestra cada fila (cuando el id de la fila no coincide).
-const CAMPO_DE_FILA = { contacto: 'contactoNombre', maquinaria: 'maquinariaPropia', insumos: 'insumosPropios' };
+export const CAMPO_DE_FILA = { contacto: 'contactoNombre', maquinaria: 'maquinariaPropia', insumos: 'insumosPropios' };
 
 /** Filas del registro con su estado: 'listo' | 'documento' (vino del PDF) | 'falta' | 'sin_dato' (opcional vacío). */
 export function armarRegistro(formulario, desdeDocumento = []) {
