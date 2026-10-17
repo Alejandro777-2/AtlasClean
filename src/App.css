@@ -349,7 +349,19 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 @keyframes aparecer { from { opacity: 0; transform: translateY(8px); } }
 @media (prefers-reduced-motion: reduce) { .como__acordeon-panel { animation: none; } }
 
-.portada-pie { padding: var(--e5) var(--e4); text-align: center; font-size: var(--t-xs); color: color-mix(in srgb, #fff 60%, transparent); background: var(--marino); border-top: 1px solid color-mix(in srgb, #fff 10%, transparent); }
+/* Footer: bloque azul propio (mismo fondo que el hero) que empieza con la ola desde el beige. */
+.portada-pie {
+  position: relative; overflow: hidden; padding: var(--ola) var(--e4) 0; text-align: center;
+  background:
+    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--cian) 18%, transparent), transparent 45%),
+    radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--azul) 20%, transparent), transparent 50%),
+    var(--marino);
+}
+.portada-pie__texto {
+  max-width: 1200px; margin: 0 auto; padding: var(--e5) 0;
+  font-size: var(--t-xs); color: color-mix(in srgb, #fff 60%, transparent);
+  border-top: 1px solid color-mix(in srgb, #fff 10%, transparent);
+}
 
 /* ── Planes: sección beige con tres tarjetas (datos en src/planes.js) ── */
 .planes { position: relative; scroll-margin-top: calc(var(--alto-nav-compacto) + 16px); }

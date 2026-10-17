@@ -373,7 +373,11 @@ export default function Portada({ sesion }) {
         <Planes />
       </main>
 
-      <footer className="portada-pie">Expo Clean Ecuador 2026</footer>
+      {/* Footer en su propio bloque azul; la ola de entrada (beige → azul) se dibuja sobre él. */}
+      <footer className="portada-pie">
+        <Ola lado="arriba" color="var(--crema)" colorMedio="var(--ola-medio)" />
+        <p className="portada-pie__texto">Expo Clean Ecuador 2026</p>
+      </footer>
     </>
   );
 }
