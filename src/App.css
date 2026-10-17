@@ -663,9 +663,10 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 .ficha__chequeo input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--ok); }
 .ficha__hecho { background: var(--ok-suave); border-color: transparent; }
 .ficha__hecho strong { text-decoration: line-through; color: var(--texto-suave); }
-.zona { display: grid; gap: 2px; }
+/* Celda «Zona» de las tablas de zonas (ficha y Requisitos). Nombre propio para no chocar con .zona (subida del pliego). */
+.celda-zona { display: grid; gap: 2px; text-align: left; line-height: 1.35; }
 .ficha__desde-documento { margin: var(--e1) 0 0; padding-left: var(--e4); display: grid; gap: 2px; }
-.zona__categoria { font-size: var(--t-xs); }
+.celda-zona__categoria { font-size: var(--t-xs); }
 .ficha__porque { display: block; margin-top: 2px; }
 .ficha__numerada, .ficha__vinetas { padding-left: var(--e5); }
 

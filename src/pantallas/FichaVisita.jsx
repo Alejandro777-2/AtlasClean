@@ -19,9 +19,9 @@ export function CeldaZona({ zona: z }) {
   const categoria = (ETIQUETAS.area[z.area] ?? z.area).replace(/\s*\(.*\)$/, '');
   const nombre = z.nombre ? z.nombre.charAt(0).toUpperCase() + z.nombre.slice(1) : categoria;
   return (
-    <span className="zona">
+    <span className="celda-zona">
       <strong>{nombre}</strong>
-      {z.nombre && <span className="texto-suave zona__categoria">{categoria}</span>}
+      {z.nombre && <span className="texto-suave celda-zona__categoria">{categoria}</span>}
     </span>
   );
 }
