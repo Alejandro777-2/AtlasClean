@@ -3,6 +3,7 @@ import { AtlasLogo, Boton, Campo, Ola } from '../components/ui.jsx';
 import ComoFunciona from './ComoFunciona.jsx';
 import SubirPliego from './SubirPliego.jsx';
 import Planes from './Planes.jsx';
+import Recorrido from '../components/Recorrido.jsx';
 import { useSolicitud } from '../estado/contexto.js';
 import { DESDE_LANDING } from '../config/opciones.js';
 
@@ -27,14 +28,6 @@ const MODOS = [
     )
   }
 ];
-// Recorrido real del cliente: esta tarjeta, el formulario completo (con la IA) y la cotización previa.
-// El primer paso cambia de nombre según el modo elegido.
-const RECORRIDO = [
-  { id: 'inicio', etiqueta: { formulario: 'Datos del lugar', documento: 'Tu pliego' } },
-  { id: 'formulario', etiqueta: 'Tu formulario' },
-  { id: 'cotizacion', etiqueta: 'Cotización previa' }
-];
-const nombrePaso = (p, modo) => (typeof p.etiqueta === 'string' ? p.etiqueta : p.etiqueta[modo]);
 // Mismas tipologías y turnos que usa la plataforma.
 const TIPOS_SITIO = [
   'Salud / Salas de hospitalización / Áreas críticas hospitalarias',
@@ -283,18 +276,7 @@ export default function Portada({ sesion }) {
             <h2 data-aparecer>Cuéntanos sobre el lugar</h2>
           </div>
           <div className="intake" data-aparecer>
-            <div className="intake__progreso">
-              <p className="intake__paso">
-                Cotiza en {RECORRIDO.length} pasos
-              </p>
-              <ol className="intake__segmentos" aria-label="Tu recorrido para cotizar">
-                {RECORRIDO.map((p, i) => (
-                  <li key={p.id} className={i === 0 ? 'intake__segmento intake__segmento--actual' : 'intake__segmento'} aria-current={i === 0 ? 'step' : undefined}>
-                    {nombrePaso(p, modo)}
-                  </li>
-                ))}
-              </ol>
-            </div>
+            <Recorrido actual={0} modo={modo} titulo="Cotiza en 3 pasos" />
 
             <div className="modos" role="tablist" aria-label="Cómo quieres empezar" onKeyDown={alTeclearModos}>
               {MODOS.map((m, i) => (

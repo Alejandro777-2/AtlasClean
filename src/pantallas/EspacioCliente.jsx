@@ -8,6 +8,7 @@
  */
 import { useEffect } from 'react';
 import { AtlasLogo } from '../components/ui.jsx';
+import Recorrido from '../components/Recorrido.jsx';
 import { PASOS_CLIENTE } from '../pasos.js';
 import { useSolicitud } from '../estado/contexto.js';
 import ContenidoCliente, { EstadoFicha } from './ContenidoCliente.jsx';
@@ -26,7 +27,12 @@ export default function EspacioCliente({ seccion }) {
   const indicePaso = PASOS_CLIENTE.findIndex((p) => p.id === id);
   const paso = indicePaso >= 0 ? PASOS_CLIENTE[indicePaso] : null;
   const actual = paso ?? SECCIONES_SOLICITUD.find((s) => s.id === id) ?? SECCIONES_SOLICITUD[0];
-  const { vista } = useSolicitud();
+  const { vista, ficha, documento } = useSolicitud();
+
+  // Recorrido: paso 2 («Tu formulario») mientras llena su solicitud; paso 3 («Cotización previa») cuando ya
+  // envió los datos y tiene la ficha con las recomendaciones (y en los pasos de la cotización).
+  const enFormulario = actual.id === 'visita' ? vista !== 'ficha' : !ficha;
+  const pasoRecorrido = ficha && !enFormulario ? 2 : 1;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -88,6 +94,9 @@ export default function EspacioCliente({ seccion }) {
       </header>
 
       <main className="contenido">
+        <section className="panel recorrido-panel" aria-label="Tu recorrido">
+          <Recorrido actual={pasoRecorrido} modo={documento ? 'documento' : 'formulario'} />
+        </section>
         {paso ? (
           <section className="panel aportes-ficha" aria-label={paso.nombre}>
             <PasoCliente paso={paso} />

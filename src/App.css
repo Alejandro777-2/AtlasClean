@@ -123,14 +123,22 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 .intake__cuerpo { display: grid; gap: 20px; }
 
 /* Progreso: "Paso 1 de 6" y seis segmentos (el primero en cian). */
-.intake__progreso { display: grid; gap: var(--e2); }
-.intake__paso { font-size: 13px; font-weight: 600; color: var(--info); }
-/* Recorrido del cliente (3 pasos con nombre): la barra de cada paso va encima de su nombre. */
-.intake__segmentos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0; padding: 0; list-style: none; }
-.intake__segmento { display: grid; gap: 6px; font-size: 12px; color: var(--texto-suave); }
-.intake__segmento::before { content: ''; height: 4px; border-radius: 999px; background: var(--linea); }
-.intake__segmento--actual { font-weight: 600; color: var(--info); }
-.intake__segmento--actual::before { background: var(--cian); }
+/* Recorrido del cliente (components/Recorrido.jsx): 3 pasos con nombre, la línea de cada paso encima.
+   Hecho: verde con ✓. Actual: cian, su línea se llena al llegar. Pendiente: gris. */
+.recorrido { display: grid; gap: var(--e2); }
+.recorrido__titulo { margin: 0; font-size: 13px; font-weight: 600; color: var(--info); }
+.recorrido__pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.recorrido__paso { display: grid; gap: 6px; font-size: var(--t-sm); color: var(--texto-suave); }
+.recorrido__barra { height: 4px; border-radius: 999px; background: var(--linea); overflow: hidden; }
+.recorrido__relleno { display: block; height: 100%; border-radius: inherit; transform-origin: left; transform: scaleX(0); }
+.recorrido__paso--hecho { color: var(--ok); font-weight: 600; }
+.recorrido__paso--hecho .recorrido__relleno { transform: scaleX(1); background: var(--ok); transition: background-color 400ms ease; }
+.recorrido__paso--actual { color: var(--info); font-weight: 600; }
+.recorrido__paso--actual .recorrido__relleno { transform: scaleX(1); background: var(--cian); animation: recorrido-llenar 700ms ease-out both; }
+@keyframes recorrido-llenar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .recorrido__paso--actual .recorrido__relleno { animation: none; } }
+/* En el espacio del cliente va en su propio panel, sobre los KPI. */
+.panel.recorrido-panel { padding: var(--e4) var(--e5); }
 
 /* Modos como tarjetas seleccionables (pestañas). El 2.º px del borde activo es un box-shadow
    para que no cambie el tamaño al seleccionar. */

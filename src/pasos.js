@@ -99,3 +99,11 @@ export const PASOS_CLIENTE = [
     descripcion: 'En qué etapa está tu solicitud y qué sigue hasta recibir la propuesta formal.'
   }
 ];
+
+// Recorrido del cliente para cotizar (barra de la tarjeta «Cotizar» y del espacio del cliente).
+// El primer paso cambia de nombre según si empezó llenando datos o subiendo su pliego.
+export const RECORRIDO_CLIENTE = [
+  { id: 'inicio', etiqueta: { formulario: 'Datos del lugar', documento: 'Tu pliego' } },
+  { id: 'formulario', etiqueta: 'Tu formulario' },
+  { id: 'cotizacion', etiqueta: 'Cotización previa' }
+];
