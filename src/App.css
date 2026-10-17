@@ -3,27 +3,41 @@
 /* ── Portada ── */
 .portada-nav { position: sticky; top: 0; z-index: 10; background: var(--marino); color: #fff; border-bottom: 1px solid var(--marino-linea); }
 .portada-nav__interior { max-width: 1200px; height: var(--alto-nav); margin: 0 auto; padding: 0 var(--e4); display: flex; align-items: center; justify-content: space-between; gap: var(--e4); }
-:root { --alto-nav: 72px; }
+/* Nav: 84px (68px compacto al hacer scroll). --nav-escala = 68/84 y --nav-sube = la mitad de la
+   diferencia: la compactación se hace con transform, no cambiando la altura. */
+:root { --alto-nav: 84px; --alto-nav-compacto: 68px; --nav-escala: 0.81; --nav-sube: -8px; }
 
 /* Landing: nav fijo y transparente sobre el hero. Al pasar 40px aparece una capa marino con
-   sombra (se anima su opacidad, no el color). El login usa .portada-nav sin el modificador. */
-.portada-nav--flotante { position: fixed; top: 0; left: 0; right: 0; background: transparent; border-bottom-color: transparent; }
+   sombra (opacidad) y todo se compacta (transform). El login usa .portada-nav sin el modificador.
+   El nav no captura clics fuera de su contenido: compacto deja una franja transparente debajo. */
+.portada-nav--flotante { position: fixed; top: 0; left: 0; right: 0; background: transparent; border-bottom-color: transparent; pointer-events: none; }
+.portada-nav--flotante .portada-nav__interior > * { pointer-events: auto; }
 .portada-nav--flotante::before {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: var(--marino); box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
-  opacity: 0; transition: opacity 200ms ease;
+  opacity: 0; transform-origin: top; transition: opacity 200ms ease, transform 200ms ease;
 }
-.portada-nav--solido::before { opacity: 1; }
-/* Barra de progreso de scroll (2px, cian) en el borde inferior del nav. */
-.portada-nav__progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--cian); transform: scaleX(0); transform-origin: left; pointer-events: none; }
+.portada-nav--flotante .portada-nav__interior, .portada-nav--flotante .logo, .portada-nav__pista { transition: transform 200ms ease; }
+.portada-nav--flotante .logo { transform-origin: left center; }
+.portada-nav--solido::before { opacity: 1; transform: scaleY(var(--nav-escala)); }
+.portada-nav--solido .portada-nav__interior { transform: translateY(var(--nav-sube)); }
+.portada-nav--solido .logo { transform: scale(0.85); }
+.portada-nav--flotante .boton { min-height: 44px; padding: 0 var(--e5); font-size: 15px; }
+/* Barra de progreso de scroll (2px, cian) en el borde inferior del nav. La pista sube con el nav
+   compacto; la barra solo escala en X. */
+.portada-nav__pista { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; overflow: hidden; pointer-events: none; }
+.portada-nav--solido .portada-nav__pista { transform: translateY(calc(var(--nav-sube) * 2)); }
+.portada-nav__progreso { display: block; height: 100%; background: var(--cian); transform: scaleX(0); transform-origin: left; }
 @supports (animation-timeline: scroll()) {
   .portada-nav__progreso { animation: progreso-pagina linear both; animation-timeline: scroll(root); }
 }
 @keyframes progreso-pagina { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-/* Divisores ondulados entre secciones (componente Ola). Alto fijo y ancho al 100 %; se solapan 1px
-   con la sección vecina para que no quede ninguna línea fina entre ambas. */
-:root { --ola: 72px; }
+/* Divisores ondulados entre secciones (componente Ola), con el borde difuminado. Alto fijo y
+   ancho al 100 %; se solapan 1px con la sección vecina para que no quede ninguna línea fina.
+   --ola-medio: tono intermedio del borde (azul claro mezclado en oklab) para evitar el gris turbio
+   que sale al mezclar marino y crema directamente. */
+:root { --ola: 120px; --ola-medio: color-mix(in oklab, var(--azul) 45%, var(--crema)); }
 
 /* Aparición al hacer scroll (lógica en Portada.jsx). Solo con JS (html.js): sin él no hay estado
    oculto y todo se ve. Anima solo opacity y transform; --retraso escalona cada sección. */
@@ -34,11 +48,14 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 .ola--abajo { bottom: -1px; }
 .ola--arriba { top: -1px; }
 
-/* El hero termina en una ola rellena de crema, el fondo de la sección siguiente. */
+/* El hero ocupa la pantalla (el nav fijo va encima, por eso su alto se suma al mínimo de 640px de
+   zona visible) y centra el contenido. Termina en una ola rellena de crema. */
 .hero {
   position: relative; overflow: hidden;
-  /* padding-top incluye el alto del nav, que es fijo y va encima del hero. */
-  padding: calc(var(--alto-nav) + 48px) 0 calc(var(--ola) + 40px); color: #fff;
+  display: flex; flex-direction: column; justify-content: center;
+  min-height: max(calc(640px + var(--alto-nav)), 100vh);
+  min-height: max(calc(640px + var(--alto-nav)), 100svh);
+  padding: calc(var(--alto-nav) + 32px) 0 calc(var(--ola) + 32px); color: #fff;
   background:
     radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--cian) 18%, transparent), transparent 45%),
     radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--azul) 20%, transparent), transparent 50%),
@@ -77,20 +94,23 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 
 .hero__interior { position: relative; max-width: 1200px; margin: 0 auto; padding: 0 var(--e4); }
 .hero__contenido { text-align: center; }
-.hero h1 { max-width: 820px; margin: var(--e4) auto; font-size: var(--t-3xl); font-weight: 800; line-height: 1.12; letter-spacing: -0.02em; }
+/* Titular: 1080px de ancho máximo para que la línea cian (la más larga) quepa entera a 4.75rem
+   y el titular siga en tres líneas. */
+.hero h1 { max-width: 1080px; margin: 0 auto; font-size: clamp(2.5rem, 5.6vw, 4.75rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; }
 .hero__resaltado { display: block; color: var(--cian); }
-.hero__texto { max-width: 620px; margin: 0 auto; font-size: var(--t-lg); font-weight: 400; letter-spacing: 0.01em; color: color-mix(in srgb, #fff 88%, transparent); }
-.hero__acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--e3); margin-top: var(--e5); }
+.hero__texto { max-width: 700px; margin: 24px auto 0; font-size: clamp(1.1rem, 1.6vw, 1.375rem); font-weight: 400; letter-spacing: 0.01em; color: color-mix(in srgb, #fff 88%, transparent); }
+.hero__acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--e4); margin-top: 36px; }
+.hero__acciones .boton { min-height: 56px; padding: 0 32px; font-size: 17px; }
 
 /* Franja de beneficios bajo los CTA */
 .hero__beneficios {
-  list-style: none; margin: 48px 0 0; padding: 0;
+  list-style: none; margin: 56px 0 0; padding: 0;
   display: flex; flex-wrap: wrap; justify-content: center; row-gap: var(--e3);
-  font-size: 15px; font-weight: 500; color: color-mix(in srgb, #fff 85%, transparent);
+  font-size: 17px; font-weight: 500; color: color-mix(in srgb, #fff 85%, transparent);
 }
 .hero__beneficios li { display: flex; align-items: center; gap: var(--e2); padding: 0 var(--e5); }
 .hero__beneficios li + li { border-left: 1px solid color-mix(in srgb, #fff 15%, transparent); }
-.hero__beneficios svg { flex: none; color: var(--cian); }
+.hero__beneficios svg { flex: none; width: 22px; height: 22px; color: var(--cian); }
 
 /* Tarjeta del formulario "Cotizar". Sus estilos van acotados a .intake: Campo y .entrada también
    los usan el login y la plataforma, que no deben cambiar. */
@@ -206,14 +226,15 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 .pliego__privacidad svg { flex: none; }
 
 /* Secciones bajo el hero (cotizar, cómo funciona). scroll-margin: que el encabezado fijo no las tape. */
-.seccion { max-width: 1200px; margin: 0 auto; padding: 64px var(--e4); scroll-margin-top: calc(var(--alto-nav) + 16px); }
+/* scroll-margin: alto del nav compacto (el que hay al llegar por un ancla) + 16px. */
+.seccion { max-width: 1200px; margin: 0 auto; padding: 64px var(--e4); scroll-margin-top: calc(var(--alto-nav-compacto) + 16px); }
 .seccion__cab { max-width: 60ch; margin: 0 auto var(--e6); text-align: center; }
 .seccion__cab h2 { margin-top: var(--e1); font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.01em; }
 
 /* ── Cómo funciona: bloque azul (con el footer). Empieza con una ola rellena de crema: la curva se
    dibuja sobre el propio bloque para que sus degradados radiales no dejen costura en la unión. ── */
 .como {
-  position: relative; scroll-margin-top: calc(var(--alto-nav) + 16px); padding-top: var(--ola); color: #fff;
+  position: relative; scroll-margin-top: calc(var(--alto-nav-compacto) + 16px); padding-top: var(--ola); color: #fff;
   background:
     radial-gradient(circle at 85% 25%, color-mix(in srgb, var(--cian) 12%, transparent), transparent 45%),
     radial-gradient(circle at 10% 70%, color-mix(in srgb, var(--azul) 18%, transparent), transparent 50%),
@@ -336,10 +357,15 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
   .hero__beneficios { flex-direction: column; align-items: center; }
   .hero__beneficios li + li { border-left: 0; }
 }
+@media (max-width: 700px) {
+  /* Móvil: nav de 68px que ya no se compacta, ola de 72px, titular de al menos 2.25rem y botones
+     en columna a lo ancho. */
+  :root { --alto-nav: 68px; --alto-nav-compacto: 68px; --nav-escala: 1; --nav-sube: 0px; --ola: 72px; }
+  .hero h1 { font-size: clamp(2.25rem, 5.6vw, 4.75rem); }
+  .hero__acciones { flex-direction: column; align-items: center; }
+  .hero__acciones .boton { width: 100%; max-width: 340px; }
+}
 @media (max-width: 600px) {
-  :root { --ola: 40px; }
-  .hero { padding: calc(var(--alto-nav) + var(--e6)) 0 calc(var(--ola) + 40px); }
-  .hero h1 { font-size: var(--t-2xl); }
   .intake { padding: var(--e5) var(--e4); }
   .modos { grid-template-columns: 1fr; }
 }

@@ -28,7 +28,8 @@ El aspecto y la distribución actuales son la norma para todo el proyecto. No se
   - sección "Cotizar" con la tarjeta del formulario centrada sobre fondo crema;
   - bloque azul (empieza con una ola crema) con la sección "Cómo funciona": maestro-detalle con el panel del paso activo a la izquierda y la lista de 6 pasos a la derecha (pestañas accesibles, avance automático cada 6 s); por debajo de 900px es un acordeón;
   - pie dentro del bloque azul, con texto pequeño.
-- El botón "Empezar una cotización" del hero no se toca: ni texto, ni color, ni tamaño, ni posición.
+- El botón "Empezar una cotización" del hero no se toca: ni texto, ni color, ni posición. Su tamaño es el de los botones del hero (`.hero__acciones .boton`: 56px de alto, 17px).
+- Nav: 84px (68px en móvil), se compacta a 68px al hacer scroll. Hero a pantalla completa (mínimo 640px visibles bajo el nav). Olas de 120px (72px en móvil) con borde difuminado.
 - Toda sección nueva usa los componentes de `src/components/ui.jsx`, sin inventar diseños nuevos.
 - En móvil se mantiene el mismo orden en una sola columna.
 - Al hacer scroll, los títulos de sección, la tarjeta del formulario y los bloques de "Cómo funciona" aparecen con un fundido corto (sin animación con prefers-reduced-motion).

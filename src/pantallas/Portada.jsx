@@ -64,12 +64,13 @@ const BENEFICIOS = [
 // Curva de nivel base (centrada en 0,0) que el fondo del hero repite a distintas escalas.
 const CURVA = 'M0,-100 C60,-104 110,-58 104,0 C99,56 52,96 0,98 C-66,100 -114,48 -108,-6 C-102,-60 -56,-97 0,-100Z';
 const ESCALAS = [0.5, 0.9, 1.3, 1.7, 2.1, 2.5, 2.9];
-// Grupos de anillos del fondo, cada uno con su pin en el centro. Coordenadas del viewBox 1440×640;
-// la deriva de cada grupo está en App.css (.hero__grupo--N).
+// Grupos de anillos del fondo, cada uno con su pin en el centro. Coordenadas del viewBox 1440×900
+// (proporción del hero a pantalla completa); misma x de siempre, en los bordes, lejos del texto.
+// La deriva de cada grupo está en App.css (.hero__grupo--N).
 const GRUPOS = [
-  { x: 170, y: 500, rot: -12, escala: 1 },
-  { x: 1290, y: 230, rot: 28, escala: 0.9 },
-  { x: 290, y: 170, rot: 8, escala: 0.6 }
+  { x: 170, y: 700, rot: -12, escala: 1.2 },
+  { x: 1290, y: 325, rot: 28, escala: 1.08 },
+  { x: 150, y: 190, rot: 8, escala: 0.72 } // más al borde: el titular ahora llega casi hasta x≈200
 ];
 
 export default function Portada({ sesion }) {
@@ -193,9 +194,12 @@ export default function Portada({ sesion }) {
   return (
     <>
       <header className={navSolido ? 'portada-nav portada-nav--flotante portada-nav--solido' : 'portada-nav portada-nav--flotante'}>
-        <span ref={barraRef} className="portada-nav__progreso" aria-hidden="true" />
+        {/* La pista sube con el nav al compactarse; la barra dentro solo escala en X. */}
+        <span className="portada-nav__pista" aria-hidden="true">
+          <span ref={barraRef} className="portada-nav__progreso" />
+        </span>
         <div className="portada-nav__interior">
-          <AtlasLogo height={32} />
+          <AtlasLogo height={40} />
           <nav aria-label="Principal">
             <Boton variante="contorno" href={destinoApp}>
               {sesion ? 'Ir a la plataforma' : 'Ingresar'}
@@ -206,7 +210,7 @@ export default function Portada({ sesion }) {
 
       <main>
         <section ref={heroRef} className={visible ? 'hero' : 'hero hero--pausado'}>
-          <svg className="hero__fondo" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <svg className="hero__fondo" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             {GRUPOS.map((g, i) => (
               // El <g> exterior lo anima el CSS; el interior lo posiciona (un transform CSS pisaría el atributo).
               <g key={i} className={`hero__grupo hero__grupo--${i + 1}`}>
@@ -249,7 +253,7 @@ export default function Portada({ sesion }) {
               </ul>
             </div>
           </div>
-          <Ola lado="abajo" color="var(--crema)" />
+          <Ola lado="abajo" color="var(--crema)" colorMedio="var(--ola-medio)" />
         </section>
 
         <section id="cotizar" className="seccion">

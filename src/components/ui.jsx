@@ -7,18 +7,32 @@ import { useId } from 'react';
 const cx = (...c) => c.filter(Boolean).join(' ');
 
 /**
- * Divisor ondulado entre secciones (decorativo). Se estira al 100 % del ancho con altura fija
- * (--ola en App.css). `lado`: 'abajo' rellena la parte inferior (va al pie de una sección),
- * 'arriba' rellena la superior (va al inicio). `color`: el fondo de la sección vecina.
+ * Divisor ondulado entre secciones (decorativo), con el borde difuminado. Se estira al 100 % del
+ * ancho con altura fija (--ola en App.css). `lado`: 'abajo' rellena la parte inferior (va al pie
+ * de una sección), 'arriba' la superior (va al inicio). `color`: el fondo de la sección vecina.
+ * `colorMedio`: una segunda ola, algo adelantada y más difuminada, que pone un tono intermedio
+ * (azul claro) en el borde para que el paso no pase por un gris turbio.
+ * Las formas se salen del viewBox por los lados y por el extremo lleno: así el desenfoque solo se
+ * nota en la curva y no deja bordes transparentes.
  */
 const OLAS = {
-  abajo: 'M0,44 C240,80 480,80 720,50 C960,20 1200,12 1440,40 L1440,80 L0,80 Z',
-  arriba: 'M0,0 L1440,0 L1440,34 C1200,70 960,66 720,36 C480,6 240,4 0,40 Z'
+  abajo: (dy) => `M-240,${70 - dy} C120,${112 - dy} 480,${112 - dy} 720,${78 - dy} C960,${44 - dy} 1260,${40 - dy} 1680,${66 - dy} L1680,320 L-240,320 Z`,
+  arriba: (dy) => `M-240,-200 L1680,-200 L1680,${44 + dy} C1260,${76 + dy} 960,${72 + dy} 720,${40 + dy} C480,${8 + dy} 120,${4 + dy} -240,${40 + dy} Z`
 };
-export function Ola({ lado = 'abajo', color, className }) {
+export function Ola({ lado = 'abajo', color, colorMedio, className }) {
+  const id = useId();
   return (
-    <svg className={cx('ola', `ola--${lado}`, className)} viewBox="0 0 1440 80" preserveAspectRatio="none" shapeRendering="geometricPrecision" aria-hidden="true" focusable="false">
-      <path d={OLAS[lado]} fill={color} />
+    <svg className={cx('ola', `ola--${lado}`, className)} viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <defs>
+        <filter id={`${id}-medio`} x="-10%" y="-60%" width="120%" height="220%">
+          <feGaussianBlur stdDeviation="14" />
+        </filter>
+        <filter id={`${id}-borde`} x="-10%" y="-60%" width="120%" height="220%">
+          <feGaussianBlur stdDeviation="9" />
+        </filter>
+      </defs>
+      {colorMedio && <path d={OLAS[lado](12)} style={{ fill: colorMedio }} filter={`url(#${id}-medio)`} />}
+      <path d={OLAS[lado](0)} style={{ fill: color }} filter={`url(#${id}-borde)`} />
     </svg>
   );
 }
