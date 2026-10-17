@@ -23,14 +23,15 @@ Solo la landing page. No hay plataforma ni flujo después de ingresar: "Ingresar
 El aspecto y la distribución actuales son la norma para todo el proyecto. No se cambian sin aprobación explícita.
 - Paleta, tipografía, espacios, radios y sombras: solo los tokens de `src/index.css`.
 - Landing, de arriba abajo:
-  - barra de navegación marino con un solo botón ("Ingresar");
-  - hero marino centrado: titular de tres líneas (la central en cian), subtítulo, botones y una franja de 3 beneficios con iconos; fondo decorativo de curvas de nivel y pines (limpio detrás del texto); sus últimos 80px se funden con el crema;
+  - barra de navegación fija con un solo botón ("Ingresar"): transparente sobre el hero, marino con sombra al hacer scroll y una barra cian de progreso de la página;
+  - hero marino centrado: titular de tres líneas (la central en cian), subtítulo, botones y una franja de 3 beneficios con iconos; fondo decorativo de curvas de nivel y pines (limpio detrás del texto); termina en una ola (SVG) rellena de crema;
   - sección "Cotizar" con la tarjeta del formulario centrada sobre fondo crema;
-  - bloque azul (los primeros 80px funden el crema con el marino) con la sección "Cómo funciona": maestro-detalle con el panel del paso activo a la izquierda y la lista de 6 pasos a la derecha (pestañas accesibles, avance automático cada 6 s); por debajo de 900px es un acordeón;
+  - bloque azul (empieza con una ola crema) con la sección "Cómo funciona": maestro-detalle con el panel del paso activo a la izquierda y la lista de 6 pasos a la derecha (pestañas accesibles, avance automático cada 6 s); por debajo de 900px es un acordeón;
   - pie dentro del bloque azul, con texto pequeño.
 - El botón "Empezar una cotización" del hero no se toca: ni texto, ni color, ni tamaño, ni posición.
 - Toda sección nueva usa los componentes de `src/components/ui.jsx`, sin inventar diseños nuevos.
 - En móvil se mantiene el mismo orden en una sola columna.
+- Al hacer scroll, los títulos de sección, la tarjeta del formulario y los bloques de "Cómo funciona" aparecen con un fundido corto (sin animación con prefers-reduced-motion).
 
 ## Reglas
 - Las pantallas usan los tokens y componentes de `src/index.css` y `src/components/ui.jsx`; nada de colores o tamaños sueltos. Si falta algo, se agrega ahí.
