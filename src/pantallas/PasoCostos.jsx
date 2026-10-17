@@ -8,6 +8,17 @@ import { estimarPresupuesto, textoRango } from '../presupuesto/estimar.js';
 import { requisitoDe, paginaDe } from '../formulario/fichaUtil.js';
 import { CONTACTO_ATLAS } from '../config/contacto.js';
 
+/** Imprime solo el presupuesto previo (y el contacto): nunca lo interno del cotizador que esté en la misma página. */
+function imprimirPresupuesto() {
+  document.body.classList.add('imprimiendo-presupuesto');
+  const limpiar = () => {
+    document.body.classList.remove('imprimiendo-presupuesto');
+    window.removeEventListener('afterprint', limpiar);
+  };
+  window.addEventListener('afterprint', limpiar);
+  window.print();
+}
+
 const fecha = () => new Date().toLocaleDateString('es-EC', { dateStyle: 'long' });
 const soloDigitos = (t) => String(t ?? '').replace(/\D/g, '');
 
@@ -154,7 +165,7 @@ export default function PasoCostos() {
       )}
 
       <div className="presupuesto__acciones solo-pantalla">
-        <Boton variante="primario" onClick={() => window.print()}>
+        <Boton variante="primario" onClick={imprimirPresupuesto}>
           Imprimir presupuesto para el cliente
         </Boton>
         <Boton variante="secundario" href="#/app/visita" onClick={() => setVista('ficha')}>

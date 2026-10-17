@@ -3,29 +3,66 @@
 /* ── Portada ── */
 .portada-nav { position: sticky; top: 0; z-index: 10; background: var(--marino); color: #fff; border-bottom: 1px solid var(--marino-linea); }
 .portada-nav__interior { max-width: 1200px; height: 72px; margin: 0 auto; padding: 0 var(--e4); display: flex; align-items: center; justify-content: space-between; gap: var(--e4); }
-.portada-nav__enlaces { display: flex; align-items: center; gap: var(--e5); font-size: var(--t-sm); font-weight: 600; }
-.portada-nav__enlaces > a:not(.boton) { color: var(--texto-sobre-marino); text-decoration: none; }
-.portada-nav__enlaces > a:not(.boton):hover { color: #fff; }
 
+/* Los últimos 80px del hero funden el marino con el crema de la sección siguiente. */
 .hero {
-  padding: 56px 0 72px; color: #fff;
+  position: relative; overflow: hidden;
+  padding: 48px 0 112px; color: #fff;
   background:
+    linear-gradient(to bottom, transparent calc(100% - 80px), var(--crema)),
     radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--cian) 18%, transparent), transparent 45%),
     radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--azul) 20%, transparent), transparent 50%),
     var(--marino);
 }
-.hero__interior { max-width: 1200px; margin: 0 auto; padding: 0 var(--e4); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--e6); align-items: center; }
-.hero h1 { margin: var(--e4) 0; font-size: var(--t-3xl); font-weight: 800; line-height: 1.12; letter-spacing: -0.02em; }
-.hero__resaltado { color: var(--cian); }
-.hero__texto { max-width: 52ch; font-size: var(--t-lg); color: var(--texto-sobre-marino); }
-.hero__acciones { display: flex; flex-wrap: wrap; gap: var(--e3); margin-top: var(--e5); }
-.hero__chip {
-  display: inline-block; padding: 4px 12px; border-radius: 999px;
-  font-size: var(--t-xs); font-weight: 700; color: var(--cian);
-  background: color-mix(in srgb, var(--cian) 10%, transparent); border: 1px solid color-mix(in srgb, var(--cian) 35%, transparent);
+/* Fondo decorativo: curvas de nivel y pines; la máscara deja limpio el centro, detrás del texto. */
+.hero__fondo {
+  position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 42% 55% at 50% 45%, transparent 35%, #000 100%);
+  mask-image: radial-gradient(ellipse 42% 55% at 50% 45%, transparent 35%, #000 100%);
 }
 
-.intake { padding: var(--e3); background: var(--superficie); color: var(--texto); border-radius: var(--radio-xl); box-shadow: var(--sombra-lg); }
+/* Deriva de cada grupo de anillos (con su pin): ida y vuelta en curva, lenta y desfasada.
+   --dx/--dy = amplitud; --k la reduce a la mitad en móvil. Solo se anima transform. */
+.hero__grupo {
+  --k: 1;
+  transform-box: fill-box; transform-origin: center; will-change: transform;
+  animation: deriva-grupo var(--dur) ease-in-out var(--retraso) infinite alternate;
+}
+/* Trayectorias hacia los bordes, nunca hacia el centro: así los pines no pasan detrás del texto. */
+.hero__grupo--1 { --dx: -120px; --dy: -120px; --dur: 40s; --retraso: -12s; }
+.hero__grupo--2 { --dx: -170px; --dy: 110px; --dur: 55s; --retraso: -31s; }
+.hero__grupo--3 { --dx: -140px; --dy: 110px; --dur: 70s; --retraso: -47s; }
+@keyframes deriva-grupo {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(calc(var(--dx) * var(--k) * 0.65), calc(var(--dy) * var(--k))) scale(1.03); }
+  100% { transform: translate(calc(var(--dx) * var(--k)), calc(var(--dy) * var(--k) * 0.35)) scale(1.06); }
+}
+
+/* Pulso del halo de cada pin */
+.hero__halo { opacity: 0.25; transform-box: fill-box; transform-origin: center; animation: pulso-pin 5s ease-in-out infinite; }
+@keyframes pulso-pin { 0%, 100% { transform: scale(1); opacity: 0.35; } 50% { transform: scale(1.25); opacity: 0.15; } }
+
+.hero--pausado .hero__grupo, .hero--pausado .hero__halo { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .hero__grupo, .hero__halo { animation: none; } }
+
+.hero__interior { position: relative; max-width: 1200px; margin: 0 auto; padding: 0 var(--e4); }
+.hero__contenido { text-align: center; }
+.hero h1 { max-width: 820px; margin: var(--e4) auto; font-size: var(--t-3xl); font-weight: 800; line-height: 1.12; letter-spacing: -0.02em; }
+.hero__resaltado { display: block; color: var(--cian); }
+.hero__texto { max-width: 620px; margin: 0 auto; font-size: var(--t-lg); font-weight: 400; letter-spacing: 0.01em; color: color-mix(in srgb, #fff 88%, transparent); }
+.hero__acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--e3); margin-top: var(--e5); }
+
+/* Franja de beneficios bajo los CTA */
+.hero__beneficios {
+  list-style: none; margin: 48px 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; justify-content: center; row-gap: var(--e3);
+  font-size: 15px; font-weight: 500; color: color-mix(in srgb, #fff 85%, transparent);
+}
+.hero__beneficios li { display: flex; align-items: center; gap: var(--e2); padding: 0 var(--e5); }
+.hero__beneficios li + li { border-left: 1px solid color-mix(in srgb, #fff 15%, transparent); }
+.hero__beneficios svg { flex: none; color: var(--cian); }
+
+.intake { max-width: 560px; margin: 0 auto; padding: var(--e3); background: var(--superficie); color: var(--texto); border-radius: var(--radio-xl); box-shadow: var(--sombra-lg); }
 .intake__cuerpo { display: grid; gap: var(--e4); padding: var(--e5) var(--e3) var(--e3); }
 .intake h2 { font-size: var(--t-lg); font-weight: 800; }
 .intake__fila { display: grid; grid-template-columns: 1fr 1fr; gap: var(--e3); }
@@ -37,14 +74,246 @@
 .subida:hover { border-color: var(--marino); }
 .subida:focus-within { box-shadow: var(--foco); }
 
-.pasos-seccion { max-width: 1200px; margin: 0 auto; padding: 64px var(--e4); }
-.pasos-seccion__cab { max-width: 60ch; margin: 0 auto var(--e6); text-align: center; }
-.pasos-seccion__cab h2 { margin-top: var(--e1); font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.01em; }
-.pasos-rejilla { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--e4); }
-.pasos-rejilla h3 { margin-bottom: var(--e1); font-size: var(--t-md); font-weight: 800; }
-.pasos-rejilla p { font-size: var(--t-sm); }
-.paso-num { display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: var(--e3); border-radius: var(--radio); background: var(--info-suave); color: var(--info); font-weight: 800; }
+/* Secciones bajo el hero (cotizar, cómo funciona). scroll-margin: que el encabezado fijo no las tape. */
+.seccion { max-width: 1200px; margin: 0 auto; padding: 64px var(--e4); scroll-margin-top: 72px; }
+.seccion__cab { max-width: 60ch; margin: 0 auto var(--e6); text-align: center; }
+.seccion__cab h2 { margin-top: var(--e1); font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.01em; }
 
+/* ── Cómo funciona: bloque azul (con el footer). Sus primeros 80px funden el crema con el marino. ── */
+.como {
+  position: relative; scroll-margin-top: 72px; padding-top: 80px; color: #fff;
+  background:
+    linear-gradient(to bottom, var(--crema), transparent 80px),
+    radial-gradient(circle at 85% 25%, color-mix(in srgb, var(--cian) 12%, transparent), transparent 45%),
+    radial-gradient(circle at 10% 70%, color-mix(in srgb, var(--azul) 18%, transparent), transparent 50%),
+    var(--marino);
+}
+/* Partículas: debajo del contenido, desde el fin del degradado; atenuadas en el centro, donde está el texto. */
+.como__particulas {
+  position: absolute; top: 80px; left: 0; width: 100%; height: calc(100% - 80px); pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 55%, rgba(0, 0, 0, 0.25) 35%, #000 90%);
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 55%, rgba(0, 0, 0, 0.25) 35%, #000 90%);
+}
+.como > .seccion { position: relative; }
+.como .antetitulo { color: var(--cian); }
+.como .seccion__cab h2 { color: #fff; }
+.como__num { flex: none; min-width: 2ch; font-size: var(--t-2xl); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; transition: color 200ms ease; }
+.como__titulo { display: block; font-size: var(--t-lg); font-weight: 700; transition: color 200ms ease; }
+.como__sub { display: block; font-size: var(--t-sm); }
+
+/* Escritorio: lista (40 %) + panel (60 %); el hueco entre ambos lo cruza el conector. */
+.como__rejilla { --hueco: 22px; display: grid; grid-template-columns: minmax(0, 40fr) minmax(0, 60fr); gap: var(--hueco); }
+
+/* Lista: tarjetas conectadas por una línea vertical con un nodo por paso. */
+.como__lista { position: relative; padding-left: 28px; }
+.como__pestanas { display: flex; flex-direction: column; gap: 10px; }
+.como__riel { position: absolute; left: 9px; width: 2px; background: color-mix(in srgb, var(--cian) 25%, transparent); }
+.como__riel--lleno { background: var(--cian); transition: height 300ms ease; }
+.como__nodo {
+  position: absolute; left: 5px; width: 10px; height: 10px; margin-top: -5px; border-radius: 50%;
+  background: var(--marino); border: 2px solid color-mix(in srgb, #fff 25%, transparent);
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+.como__nodo--lleno { background: var(--cian); border-color: var(--cian); }
+.como__conector { position: absolute; top: 0; left: 100%; width: var(--hueco); height: 2px; margin-top: -1px; background: var(--cian); transition: transform 300ms ease; }
+.como__conector::after { content: ''; position: absolute; right: -3px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: var(--cian); }
+
+.como__tarjeta {
+  position: relative; overflow: hidden; display: flex; align-items: center; gap: var(--e4); width: 100%;
+  padding: var(--e4) var(--e5); font: inherit; text-align: left; color: inherit; cursor: pointer;
+  background: color-mix(in srgb, #fff 4%, transparent); border: 1px solid color-mix(in srgb, #fff 8%, transparent); border-radius: 14px;
+  transition: border-color 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
+}
+/* Inactivas, todas iguales. Número y subtítulo al 55 % (no 35 %) para pasar 4.5:1 sobre el marino. */
+.como__tarjeta .como__num { color: color-mix(in srgb, #fff 55%, transparent); }
+.como__tarjeta .como__titulo { color: color-mix(in srgb, #fff 70%, transparent); }
+.como__tarjeta .como__sub { color: color-mix(in srgb, #fff 55%, transparent); }
+.como__tarjeta:hover { border-color: color-mix(in srgb, #fff 18%, transparent); }
+.como__tarjeta:hover .como__num, .como__tarjeta:hover .como__titulo { color: color-mix(in srgb, #fff 90%, transparent); }
+.como__tarjeta[aria-selected='true'] {
+  background: color-mix(in srgb, var(--cian) 10%, transparent); border-color: color-mix(in srgb, var(--cian) 70%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--cian) 25%, transparent);
+}
+.como__tarjeta[aria-selected='true'] .como__num { color: var(--cian); }
+.como__tarjeta[aria-selected='true'] .como__titulo { color: #fff; }
+.como__tarjeta[aria-selected='true'] .como__sub { color: color-mix(in srgb, #fff 80%, transparent); }
+
+/* Barra de progreso del avance automático: su fin dispara el paso siguiente. */
+.como__progreso { position: absolute; left: 0; bottom: 0; width: 100%; height: 2px; background: var(--cian); transform-origin: left; animation: progreso 6s linear forwards; }
+@keyframes progreso { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.como--pausado .como__progreso { animation-play-state: paused; }
+
+/* Panel de detalle: los 6 paneles comparten celda, así la caja mide lo del más largo. */
+.como__detalle {
+  position: relative; overflow: hidden; display: grid; align-items: center; padding: 48px;
+  border-radius: var(--radio-xl);
+  background: linear-gradient(to bottom, color-mix(in srgb, #fff 8%, transparent), color-mix(in srgb, #fff 3%, transparent));
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 48px color-mix(in srgb, var(--cian) 10%, transparent);
+}
+/* Borde con degradado cian → transparente (máscara que deja solo el anillo de 1px). */
+.como__detalle::before {
+  content: ''; position: absolute; inset: 0; padding: 1px; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cian) 70%, transparent), transparent 65%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.como__panel {
+  grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: var(--e4);
+  opacity: 0; transform: translateX(12px); visibility: hidden;
+  transition: opacity 250ms ease, transform 250ms ease, visibility 0s 250ms;
+}
+.como__panel--activo { opacity: 1; transform: translateX(0); visibility: visible; transition: opacity 250ms ease, transform 250ms ease; }
+/* Número de marca de agua: detrás del texto (z-index -1 dentro del panel), en la esquina inferior derecha. */
+.como__marca {
+  position: absolute; z-index: -1; right: -24px; bottom: -72px;
+  font-size: 200px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, #fff 5%, transparent); pointer-events: none;
+}
+.como__det-num { font-size: var(--t-sm); font-weight: 700; letter-spacing: 0.08em; color: var(--cian); }
+.como__det-titulo { font-size: var(--t-3xl); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+.como__det-desc { font-size: var(--t-lg); line-height: 1.55; color: color-mix(in srgb, #fff 85%, transparent); }
+.como__vinetas { list-style: none; margin: 0 0 var(--e2); padding: 0; display: grid; gap: var(--e3); color: color-mix(in srgb, #fff 85%, transparent); }
+.como__vinetas li { display: flex; align-items: center; gap: var(--e3); }
+.como__vinetas svg { flex: none; color: var(--cian); }
+
+/* Móvil: acordeón (sin cambios respecto a la versión anterior) */
+.como__tab {
+  position: relative; display: flex; align-items: center; gap: var(--e4); width: 100%;
+  padding: var(--e4) var(--e4) var(--e4) var(--e5);
+  font: inherit; text-align: left; color: inherit; background: transparent; border: 0; cursor: pointer;
+}
+.como__item + .como__item { border-top: 1px solid color-mix(in srgb, #fff 10%, transparent); }
+.como__tab .como__num { color: color-mix(in srgb, #fff 25%, transparent); }
+.como__tab .como__titulo { color: color-mix(in srgb, #fff 60%, transparent); }
+.como__tab .como__sub { color: color-mix(in srgb, #fff 45%, transparent); }
+.como__tab:hover .como__num, .como__tab:hover .como__titulo { color: color-mix(in srgb, #fff 85%, transparent); }
+.como__tab[aria-expanded='true'] .como__num { color: var(--cian); }
+.como__tab[aria-expanded='true'] .como__titulo { color: #fff; }
+.como__tab[aria-expanded='true'] .como__sub { color: color-mix(in srgb, #fff 80%, transparent); }
+.como__tab[aria-expanded='true']::before { content: ''; position: absolute; left: 0; top: var(--e3); bottom: var(--e3); width: 3px; border-radius: 3px; background: var(--cian); }
+.como__acordeon-panel { display: flex; flex-direction: column; align-items: flex-start; gap: var(--e4); padding: 0 var(--e4) var(--e5) var(--e5); animation: aparecer 250ms ease; }
+@keyframes aparecer { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .como__acordeon-panel { animation: none; } }
+
+.portada-pie { padding: var(--e5) var(--e4); text-align: center; font-size: var(--t-xs); color: color-mix(in srgb, #fff 60%, transparent); background: var(--marino); border-top: 1px solid color-mix(in srgb, #fff 10%, transparent); }
+
+/* ── Pantallas pequeñas ── */
+@media (max-width: 800px) {
+  .hero__grupo { --k: 0.5; }
+  .hero__grupo--3 { display: none; }
+  .hero__beneficios { flex-direction: column; align-items: center; }
+  .hero__beneficios li + li { border-left: 0; }
+}
+@media (max-width: 600px) {
+  .hero { padding: var(--e6) 0 112px; }
+  .hero h1 { font-size: var(--t-2xl); }
+  .intake__fila { grid-template-columns: 1fr; }
+}
+
+/* ── Login y Autenticación ── */
+.login-pantalla { min-height: 100vh; display: flex; flex-direction: column; background: var(--crema); }
+.login-contenedor { flex: 1; display: grid; place-items: center; padding: var(--e5) var(--e4); }
+.login-tarjeta { width: 100%; max-width: 480px; padding: var(--e6); }
+.login-tarjeta__cab { text-align: center; margin-bottom: var(--e5); display: flex; flex-direction: column; align-items: center; gap: var(--e2); }
+.login-tarjeta__cab h1 { font-size: var(--t-2xl); font-weight: 800; color: var(--marino); }
+.login-logo-circulo { width: 56px; height: 56px; border-radius: var(--radio); background: var(--marino); display: grid; place-items: center; margin-bottom: var(--e2); }
+.login-logo-circulo .marca__simbolo { width: 36px; height: 36px; font-size: var(--t-lg); }
+.login-form { display: grid; gap: var(--e4); }
+.login-credenciales-demo { background: var(--superficie-2); border: 1px dashed var(--azul); border-radius: var(--radio); padding: var(--e3); display: flex; flex-direction: column; gap: var(--e2); font-size: var(--t-xs); }
+.login-credenciales-demo code { background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--linea); font-weight: bold; }
+.login-pie { margin-top: var(--e5); text-align: center; font-size: var(--t-xs); border-top: 1px solid var(--linea); padding-top: var(--e3); }
+.boton-ancho-total { width: 100%; }
+.boton--pequeno { min-height: 30px; padding: 0 var(--e3); font-size: var(--t-xs); }
+
+/* ── Alertas y Mensajes ── */
+.alerta-error { display: flex; align-items: center; gap: var(--e2); padding: var(--e3); border-radius: var(--radio); background: var(--error-suave); color: var(--error); font-size: var(--t-sm); font-weight: 600; margin-bottom: var(--e4); }
+.banner-exito { display: flex; align-items: center; justify-content: space-between; gap: var(--e3); padding: var(--e3) var(--e4); border-radius: var(--radio); background: var(--ok-suave); color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent); font-size: var(--t-sm); font-weight: 600; }
+
+/* ── Asistente IA ── */
+.asistente-ia-contenedor { background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio-lg); padding: var(--e5); margin-bottom: var(--e5); box-shadow: var(--sombra-sm); }
+.asistente-ia-cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--e4); margin-bottom: var(--e4); }
+.asistente-ia-titulo-grupo { display: flex; gap: var(--e3); align-items: flex-start; }
+.asistente-ia-icono { width: 36px; height: 36px; border-radius: var(--radio-sm); background: linear-gradient(135deg, var(--cian), var(--azul)); color: var(--marino); display: grid; place-items: center; font-size: var(--t-xl); font-weight: 800; flex: none; }
+.asistente-ia-cabecera h3 { font-size: var(--t-lg); font-weight: 800; color: var(--marino); }
+.asistente-ia-grid { display: grid; grid-template-columns: 1fr; gap: var(--e4); }
+.asistente-dropzone {
+  display: grid; gap: var(--e2); padding: var(--e5); text-align: center; cursor: pointer;
+  background: var(--info-suave); border: 2px dashed var(--azul); border-radius: var(--radio-lg);
+  transition: all 150ms ease;
+}
+.asistente-dropzone:hover, .asistente-dropzone--activo { border-color: var(--marino); background: color-mix(in srgb, var(--info-suave) 80%, white); }
+.dropzone-icono { font-size: 32px; }
+.asistente-cargando { display: flex; align-items: center; justify-content: center; gap: var(--e2); color: var(--info); font-weight: 700; margin-top: var(--e2); }
+.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(14, 39, 72, 0.2); border-top-color: var(--cian); border-radius: 50%; animation: girar 0.6s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+.demo-chips-seccion { margin-top: var(--e3); display: flex; flex-direction: column; align-items: center; gap: var(--e2); }
+.demo-botones-grupo { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--e2); }
+
+.asistente-panel-recomendacion { background: #fdfefe; border: 2px solid var(--cian); padding: var(--e5); border-radius: var(--radio-lg); }
+.panel-rec-cab { display: flex; align-items: center; justify-content: space-between; gap: var(--e4); margin-bottom: var(--e4); flex-wrap: wrap; }
+.panel-rec-cab h4 { font-size: var(--t-xl); font-weight: 800; color: var(--marino); margin-top: var(--e1); }
+.boton--aplicar-ia { font-size: var(--t-sm); padding: 0 var(--e4); height: 42px; }
+.rec-grid-detalles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e4); }
+.rec-item { display: flex; flex-direction: column; gap: 4px; background: var(--superficie-2); padding: var(--e3); border-radius: var(--radio); border: 1px solid var(--linea); }
+.rec-item__titulo { font-size: var(--t-xs); font-weight: 700; text-transform: uppercase; color: var(--info); }
+.rec-item__valor { font-size: var(--t-sm); color: var(--marino); }
+.rec-lista-chips { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.rec-alertas-lista { list-style: none; padding: 0; margin: 4px 0 0; font-size: var(--t-xs); color: var(--aviso); display: grid; gap: 4px; }
+
+/* ── Formularios y Bloques ── */
+.formulario-bloques { display: grid; gap: var(--e5); }
+.formulario-bloque { background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio-lg); padding: var(--e5); box-shadow: var(--sombra-sm); }
+.formulario-bloque__cab { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--linea); padding-bottom: var(--e3); margin-bottom: var(--e4); }
+.formulario-bloque__cab h3 { font-size: var(--t-lg); font-weight: 800; color: var(--marino); }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--e4); }
+.form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--e4); }
+.form-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--e4); }
+
+/* ── Selectores de Riesgo Visual ── */
+.selector-riesgo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--e3); }
+.opcion-riesgo {
+  padding: var(--e3); border: 2px solid var(--linea); border-radius: var(--radio); cursor: pointer;
+  background: var(--superficie); display: flex; flex-direction: column; gap: var(--e1); text-align: left;
+  transition: all 120ms ease;
+}
+.opcion-riesgo:hover { border-color: var(--azul); }
+.opcion-riesgo--activa { border-color: var(--marino); box-shadow: var(--foco); background: var(--superficie-2); }
+.opcion-riesgo strong { font-size: var(--t-sm); font-weight: 800; }
+.opcion-riesgo span { font-size: var(--t-xs); color: var(--texto-suave); }
+
+/* ── Áreas con Licencia ── */
+.areas-licencia-caja { background: var(--superficie-2); border: 1px solid var(--linea); border-radius: var(--radio); padding: var(--e4); margin-top: var(--e3); }
+.areas-licencia-lista { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--e2); margin-top: var(--e2); }
+.checkbox-licencia { display: flex; align-items: flex-start; gap: var(--e2); font-size: var(--t-sm); cursor: pointer; }
+.checkbox-licencia input { margin-top: 3px; accent-color: var(--azul); }
+
+/* ── Controles de Dotación Personal ── */
+.contador-grupo { display: flex; align-items: center; border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; background: #fff; }
+.contador-boton { width: 40px; height: 40px; background: var(--superficie-2); border: 0; font-size: var(--t-lg); font-weight: bold; cursor: pointer; color: var(--marino); }
+.contador-boton:hover { background: color-mix(in srgb, var(--cian) 30%, transparent); }
+.contador-valor { flex: 1; text-align: center; font-size: var(--t-lg); font-weight: 800; }
+
+/* ── Resumen de Costos y Acciones Excel ── */
+.barra-acciones-excel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); padding: var(--e4); background: var(--marino); color: #fff; border-radius: var(--radio-lg); margin-top: var(--e5); }
+.barra-acciones-excel__info { display: flex; flex-direction: column; gap: 2px; }
+.barra-acciones-excel__info h4 { font-size: var(--t-lg); font-weight: 800; color: #fff; }
+.barra-acciones-excel__info p { font-size: var(--t-xs); color: var(--texto-sobre-marino); }
+.barra-acciones-excel__botones { display: flex; flex-wrap: wrap; gap: var(--e2); }
+
+.propuesta-tarjeta { background: #fff; border: 2px solid var(--linea); border-radius: var(--radio-lg); padding: var(--e5); }
+.propuesta-cabecera { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--marino); padding-bottom: var(--e4); margin-bottom: var(--e4); }
+.propuesta-tabla { width: 100%; border-collapse: collapse; margin: var(--e4) 0; }
+.propuesta-tabla td, .propuesta-tabla th { padding: 10px 14px; border-bottom: 1px solid var(--linea); }
+.propuesta-tabla th { background: var(--superficie-2); font-weight: 700; text-align: left; }
+.propuesta-total-fila { font-size: var(--t-lg); font-weight: 800; background: var(--info-suave); }
+
+@media (max-width: 900px) {
+  .rec-grid-detalles, .form-grid-2, .form-grid-3, .form-grid-4, .selector-riesgo-grid, .areas-licencia-lista { grid-template-columns: 1fr; }
+  .barra-acciones-excel { flex-direction: column; align-items: stretch; }
+}
+
+/* Armazón de la plataforma (flujo de login y cotización), recuperado de la estructura base. */
 /* ── Plataforma ── */
 .plataforma {
   display: grid; min-height: 100vh;
@@ -87,7 +356,8 @@
 .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--e3); }
 .leyenda-riesgo { display: flex; flex-wrap: wrap; gap: var(--e2); margin-bottom: var(--e4); }
 
-/* ── Paso 1: formulario del cliente ── */
+/* ═══ Módulo del cliente: Asistente de visita, ficha, registro y presupuesto previo ═══ */
+/* ── Formulario del cliente ── */
 .formulario { display: grid; gap: var(--e5); }
 .formulario__cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); }
 .formulario__cabecera p { max-width: 70ch; }
@@ -123,7 +393,7 @@
 .ficha__requisitos li { display: flex; align-items: flex-start; gap: var(--e3); }
 .ficha__requisitos .insignia { flex: none; min-width: 64px; justify-content: center; }
 .ficha__lista--avisos.ficha__lista--neutra li { background: var(--info-suave); border-left-color: var(--info); }
-.error-pantalla { display: grid; gap: var(--e5); max-width: 720px; margin: 0 auto; padding: var(--e6) var(--e4); }
+.error-pantalla { color: var(--marino); display: grid; gap: var(--e5); max-width: 720px; margin: 0 auto; padding: var(--e6) var(--e4); }
 .ficha { display: grid; gap: var(--e5); }
 .ficha__cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); }
 .ficha__insignias, .ficha__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); }
@@ -170,6 +440,9 @@
   .presupuesto .presupuesto__resumen .antetitulo, .presupuesto .presupuesto__unidad, .presupuesto .presupuesto__extra dt { color: var(--texto-suave); }
   .contacto, .presupuesto .tabla tr { break-inside: avoid; }
   .panel:has(.presupuesto) > h2, .panel:has(.presupuesto) > .panel__desc { display: none; }
+  /* Al imprimir el presupuesto para el cliente, se oculta todo lo demás del paso (motor de costos interno, etc.). */
+  body.imprimiendo-presupuesto .contenido > :not(.aportes-ficha) { display: none !important; }
+  body.imprimiendo-presupuesto .aportes-ficha { border: 0; box-shadow: none; padding: 0; }
 }
 
 /* ── Presupuesto previo y contacto (paso Costos) ── */
@@ -201,8 +474,6 @@
   .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
-  .hero__interior { grid-template-columns: 1fr; }
-  .pasos-rejilla { grid-template-columns: 1fr 1fr; }
   .plataforma { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; grid-template-areas: 'lateral' 'superior' 'contenido'; }
   .lateral { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--e3); padding: var(--e3) var(--e4); }
   .lateral nav { flex-basis: 100%; min-width: 0; }
@@ -216,9 +487,5 @@
   .contenido { padding: var(--e4); }
 }
 @media (max-width: 600px) {
-  .portada-nav__enlaces > a:not(.boton) { display: none; }
-  .hero { padding: var(--e6) 0; }
-  .hero h1 { font-size: var(--t-2xl); }
-  .intake__fila, .pasos-rejilla { grid-template-columns: 1fr; }
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

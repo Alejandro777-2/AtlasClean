@@ -1,157 +1,219 @@
-import { useState } from 'react';
-import { Boton, Campo, Insignia, Marca, Pestanas } from '../components/ui.jsx';
-import { PASOS } from '../pasos.js';
-import { useSolicitud } from '../estado/contexto.js';
-import { DOCUMENTO, INTAKE_TIPOS, INTAKE_TURNOS } from '../config/opciones.js';
+﻿import { useEffect, useRef, useState } from 'react';
+import { AtlasLogo, Boton, Campo, Pestanas } from '../components/ui.jsx';
+import ComoFunciona from './ComoFunciona.jsx';
 
 const MODOS = [
   { valor: 'formulario', etiqueta: 'Llenar requisitos' },
-  { valor: 'documento', etiqueta: 'Subir documento' }
+  { valor: 'documento', etiqueta: 'Subir pliego con IA' }
+];
+// Mismas tipologías y turnos que usa la plataforma.
+const TIPOS_SITIO = [
+  'Salud / Salas de hospitalización / Áreas críticas hospitalarias',
+  'Comercial / Retail / Patios de comida',
+  'Corporativo / Oficinas',
+  'Industrial / Plantas de producción / Bodegas',
+  'Educativo / Institucional'
+];
+const TURNOS = ['Matutino (06:00 - 14:30)', 'Vespertino (14:00 - 22:00)', 'Nocturno (22:00 - 06:00)', 'Rotativo 24/7'];
+
+// Beneficios bajo los CTA del hero. Iconos lineales propios (SVG en línea, sin dependencias).
+const BENEFICIOS = [
+  {
+    texto: '6 pasos guiados',
+    icono: <path d="M10 6h10M10 12h10M10 18h10M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17" />
+  },
+  {
+    texto: 'Personal, insumos y equipos calculados',
+    icono: (
+      <>
+        <rect x="5" y="3" width="14" height="18" rx="2" />
+        <path d="M8 7h8M8 11h1M12 11h1M16 11h0M8 15h1M12 15h1M8 18h1M12 18h1M16 14v4" />
+      </>
+    )
+  },
+  {
+    texto: 'Propuesta lista para el cliente',
+    icono: (
+      <>
+        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+        <path d="M14 3v5h5M9 13h6M9 17h4" />
+      </>
+    )
+  }
 ];
 
-const irAlFormulario = () => {
-  window.location.hash = '#/app/visita';
-};
+// Curva de nivel base (centrada en 0,0) que el fondo del hero repite a distintas escalas.
+const CURVA = 'M0,-100 C60,-104 110,-58 104,0 C99,56 52,96 0,98 C-66,100 -114,48 -108,-6 C-102,-60 -56,-97 0,-100Z';
+const ESCALAS = [0.5, 0.9, 1.3, 1.7, 2.1, 2.5, 2.9];
+// Grupos de anillos del fondo, cada uno con su pin en el centro. Coordenadas del viewBox 1440×640;
+// la deriva de cada grupo está en App.css (.hero__grupo--N).
+const GRUPOS = [
+  { x: 170, y: 500, rot: -12, escala: 1 },
+  { x: 1290, y: 230, rot: 28, escala: 0.9 },
+  { x: 290, y: 170, rot: 8, escala: 0.6 }
+];
 
-export default function Portada() {
+export default function Portada({ sesion }) {
   const [modo, setModo] = useState('formulario');
-  const [errorArchivo, setErrorArchivo] = useState(null);
-  const { formulario, cambiarVarios, documento, adjuntarDocumento, setVista } = useSolicitud();
-  const turnoActual = INTAKE_TURNOS.find((t) => t.horario.join() === formulario.horario.join())?.valor ?? 'diurno';
+  const [archivo, setArchivo] = useState(null);
+  const [analizando, setAnalizando] = useState(false);
 
-  // El formulario corto pre-llena el formulario completo del paso 1.
-  const continuar = (e) => {
+  // Con sesión se entra directo a la plataforma; sin sesión, al login.
+  const destinoApp = sesion ? '#/app/requisitos' : '#/login';
+
+  const irAPlataforma = (e) => {
     e.preventDefault();
-    const datos = new FormData(e.currentTarget);
-    const turno = INTAKE_TURNOS.find((t) => t.valor === datos.get('turno'));
-    cambiarVarios({ empresa: String(datos.get('cliente') ?? '').trim(), tipologia: String(datos.get('tipo') ?? ''), horario: turno?.horario ?? [] });
-    setVista('formulario');
-    irAlFormulario();
+    window.location.hash = destinoApp;
   };
 
-  const empezar = () => setVista('formulario');
-
-  const alElegirArchivo = async (e) => {
-    setErrorArchivo(await adjuntarDocumento(e.target.files[0]));
-    e.target.value = '';
+  // Envía el pliego al backend (/api, proxy de Vite) y pasa a la plataforma con o sin resultado.
+  const subirDocumento = async (file) => {
+    if (!file) return;
+    setArchivo(file.name);
+    setAnalizando(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const resp = await fetch('/api/analizar-documento', { method: 'POST', body: formData });
+      if (resp.ok) {
+        const json = await resp.json();
+        if (json.datos) sessionStorage.setItem('atlas_datos_ia_precargados', JSON.stringify(json.datos));
+      }
+    } catch (e) {
+      console.warn('Error analizando documento en portada:', e);
+    } finally {
+      setAnalizando(false);
+      window.location.hash = destinoApp;
+    }
   };
+
+  // Pausa las animaciones del fondo cuando el hero sale de pantalla (ahorra batería).
+  const heroRef = useRef(null);
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const observador = new IntersectionObserver(([entrada]) => setVisible(entrada.isIntersecting));
+    observador.observe(heroRef.current);
+    return () => observador.disconnect();
+  }, []);
 
   return (
     <>
       <header className="portada-nav">
         <div className="portada-nav__interior">
-          <Marca />
-          <nav className="portada-nav__enlaces" aria-label="Principal">
-            <a href="#como-funciona">Cómo funciona</a>
-            <Boton variante="destacado" href="#/app/visita" onClick={empezar}>
-              Entrar a la plataforma
+          <AtlasLogo height={32} />
+          <nav aria-label="Principal">
+            <Boton variante="contorno" href={destinoApp}>
+              {sesion ? 'Ir a la plataforma' : 'Ingresar'}
             </Boton>
           </nav>
         </div>
       </header>
 
       <main>
-        <section className="hero">
+        <section ref={heroRef} className={visible ? 'hero' : 'hero hero--pausado'}>
+          <svg className="hero__fondo" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            {GRUPOS.map((g, i) => (
+              // El <g> exterior lo anima el CSS; el interior lo posiciona (un transform CSS pisaría el atributo).
+              <g key={i} className={`hero__grupo hero__grupo--${i + 1}`}>
+                <g transform={`translate(${g.x} ${g.y})`}>
+                  <g fill="none" stroke="#fff" strokeWidth="1" opacity="0.055">
+                    {ESCALAS.map((s) => (
+                      <path key={s} d={CURVA} transform={`rotate(${g.rot}) scale(${s * g.escala})`} vectorEffect="non-scaling-stroke" />
+                    ))}
+                  </g>
+                  <circle className="hero__halo" r="22" fill="var(--cian)" />
+                  <circle r="6" fill="var(--cian)" opacity="0.35" />
+                </g>
+              </g>
+            ))}
+          </svg>
+
           <div className="hero__interior">
-            <div>
-              <span className="hero__chip">Expo Clean Ecuador 2026 · Reto 2</span>
+            <div className="hero__contenido">
               <h1>
                 Una cotización de limpieza <span className="hero__resaltado">clara, completa y a la medida</span> de cada lugar.
               </h1>
-              <p className="hero__texto">Atlas te guía paso a paso, calcula todos los costos y deja la propuesta lista para presentar al cliente.</p>
+              <p className="hero__texto">Atlas te guía paso a paso, calcula todos los costos y deja la propuesta lista en minutos, sin hojas de cálculo.</p>
               <div className="hero__acciones">
-                {/* Abre el formulario detallado del Asistente de visita en una pestaña nueva del navegador. */}
-                <Boton variante="destacado" href="#/app/visita/formulario" target="_blank" rel="opener">
-                  Empezar una cotización ↗
+                <Boton variante="destacado" href="#cotizar">
+                  Empezar una cotización
                 </Boton>
-                <Boton variante="fantasma" href="#como-funciona">
-                  Ver cómo funciona
+                <Boton variante="contorno" href="#como-funciona">
+                  Ver cómo funciona <span aria-hidden="true">↓</span>
                 </Boton>
               </div>
+              <ul className="hero__beneficios">
+                {BENEFICIOS.map((b) => (
+                  <li key={b.texto}>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      {b.icono}
+                    </svg>
+                    {b.texto}
+                  </li>
+                ))}
+              </ul>
             </div>
+          </div>
+        </section>
 
-            <div className="intake">
+        <section id="cotizar" className="seccion">
+          <div className="seccion__cab">
+            <p className="antetitulo">Cotizar</p>
+            <h2>Cuéntanos sobre el lugar</h2>
+          </div>
+          <div className="intake">
               <Pestanas etiqueta="Cómo empezar" opciones={MODOS} valor={modo} alCambiar={setModo} />
 
               {modo === 'formulario' ? (
-                <form className="intake__cuerpo" onSubmit={continuar}>
+                <form className="intake__cuerpo" onSubmit={irAPlataforma}>
                   <div>
                     <h2>Describe el lugar</h2>
-                    <p className="texto-suave">Con estos datos empieza la cotización. Luego completas el resto en el Asistente de visita.</p>
+                    <p className="texto-suave">Con estos datos empieza la cotización.</p>
                   </div>
-                  <Campo etiqueta="Empresa o entidad">{(id) => <input id={id} className="entrada" name="cliente" defaultValue={formulario.empresa} required />}</Campo>
+                  <Campo etiqueta="Empresa o entidad">{(id) => <input id={id} className="entrada" name="cliente" required />}</Campo>
                   <div className="intake__fila">
                     <Campo etiqueta="Tipo de sitio">
                       {(id) => (
-                        <select id={id} className="entrada" name="tipo" defaultValue={INTAKE_TIPOS.some((t) => t.valor === formulario.tipologia) ? formulario.tipologia : INTAKE_TIPOS[0].valor}>
-                          {INTAKE_TIPOS.map((t) => (
-                            <option key={t.valor} value={t.valor}>
-                              {t.etiqueta}
-                            </option>
+                        <select id={id} className="entrada" name="tipo">
+                          {TIPOS_SITIO.map((t) => (
+                            <option key={t}>{t}</option>
                           ))}
                         </select>
                       )}
                     </Campo>
                     <Campo etiqueta="Turnos">
                       {(id) => (
-                        <select id={id} className="entrada" name="turno" defaultValue={turnoActual}>
-                          {INTAKE_TURNOS.map((t) => (
-                            <option key={t.valor} value={t.valor}>
-                              {t.etiqueta}
-                            </option>
+                        <select id={id} className="entrada" name="turno">
+                          {TURNOS.map((t) => (
+                            <option key={t}>{t}</option>
                           ))}
                         </select>
                       )}
                     </Campo>
                   </div>
                   <Boton variante="primario" type="submit">
-                    Continuar a la plataforma
+                    Continuar
                   </Boton>
                 </form>
               ) : (
                 <div className="intake__cuerpo">
                   <div>
                     <h2>Sube el pliego o requerimiento</h2>
-                    <p className="texto-suave">PDF o texto, hasta {DOCUMENTO.limiteMb} MB. El asistente lo lee junto con el formulario.</p>
+                    <p className="texto-suave">PDF, Word o TXT. La IA extraerá metraje, riesgo y personal sugerido.</p>
                   </div>
                   <label className="subida">
-                    <input type="file" className="visualmente-oculto" accept={DOCUMENTO.tiposAceptados} onChange={alElegirArchivo} />
-                    <strong>{documento?.nombre ?? 'Elige un archivo'}</strong>
-                    <span className="texto-suave">{documento?.base64 ? 'Archivo listo. Haz clic para cambiarlo.' : 'Haz clic para seleccionarlo'}</span>
-                  </label>
-                  {errorArchivo ? <Insignia tono="error">{errorArchivo}</Insignia> : <Insignia tono="info">La IA lo analiza al generar la ficha de visita</Insignia>}
-                  <Boton
-                    variante="primario"
-                    disabled={!documento?.base64}
-                    onClick={() => {
-                      setVista('formulario');
-                      irAlFormulario();
-                    }}
-                  >
-                    Continuar con el documento
-                  </Boton>
-                </div>
+                    <input type="file" className="visualmente-oculto" accept=".pdf,.doc,.docx,.txt" onChange={(e) => subirDocumento(e.target.files[0])} />
+                    <strong>{archivo ?? 'Elige un pliego o TDR (PDF/Word)'}</strong>
+                    <span className="texto-suave">{analizando ? 'Analizando pliego…' : 'Haz clic para seleccionarlo'}</span>
+                  </label>                </div>
               )}
-            </div>
           </div>
         </section>
 
-        <section id="como-funciona" className="pasos-seccion">
-          <div className="pasos-seccion__cab">
-            <p className="antetitulo">Cómo funciona</p>
-            <h2>Seis pasos, de los requisitos a la propuesta</h2>
-          </div>
-          <ol className="pasos-rejilla">
-            {PASOS.map((p, i) => (
-              <li key={p.id} className="panel">
-                <span className="paso-num">{i + 1}</span>
-                <h3>{p.nombre}</h3>
-                <p className="texto-suave">{p.descripcion}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <ComoFunciona />
       </main>
+
+      <footer className="portada-pie">Expo Clean Ecuador 2026</footer>
     </>
   );
 }

@@ -3,7 +3,7 @@
  * React solo permite capturar estos errores con un componente de clase.
  */
 import { Component } from 'react';
-import { Aviso, Boton, Marca } from './ui.jsx';
+import { Aviso, AtlasLogo, Boton } from './ui.jsx';
 import { CLAVE_BORRADOR } from '../estado/borrador.js';
 
 export default class ErrorPantalla extends Component {
@@ -31,7 +31,7 @@ export default class ErrorPantalla extends Component {
     if (!this.state.error) return this.props.children;
     return (
       <div className="error-pantalla">
-        <Marca />
+        <AtlasLogo height={32} letters="currentColor" />
         <Aviso
           tono="error"
           titulo="No se pudo mostrar esta pantalla"
