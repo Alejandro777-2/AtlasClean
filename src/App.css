@@ -365,6 +365,32 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 
 /* ── Planes: sección beige con tres tarjetas (datos en src/planes.js) ── */
 .planes { position: relative; scroll-margin-top: calc(var(--alto-nav-compacto) + 16px); }
+
+/* ── Partículas sobre crema (Cotizar y Planes; tema "claro" de Particulas.jsx) ──
+   El canvas cubre su sección y no la desborda (las olas se dibujan dentro de los bloques azules).
+   Máscara: se desvanece 80px arriba y abajo (sin corte junto a la ola) y baja al 35 % en el
+   rectángulo central del contenido (--ancho-limpio: la tarjeta del formulario o las de planes). */
+.cotizar { position: relative; scroll-margin-top: calc(var(--alto-nav-compacto) + 16px); }
+.cotizar > .seccion, .planes > .seccion { position: relative; }
+/* Tercera capa: un óvalo casi transparente (10 %) detrás de la cabecera (eyebrow, título,
+   subtítulo), para que ningún punto baje el contraste de esos textos. --cabecera-y: su centro. */
+.particulas-claras {
+  --ancho-limpio: 680px;
+  --cabecera-y: 130px;
+  --mascara-vertical: linear-gradient(to bottom, transparent, #000 80px, #000 calc(100% - 80px), transparent);
+  --mascara-cabecera: radial-gradient(ellipse min(48vw, 460px) 150px at 50% var(--cabecera-y), rgba(0, 0, 0, 0.1) 55%, #000 100%);
+  --mascara-centro: linear-gradient(to right,
+    #000 calc(50% - var(--ancho-limpio) / 2 - 60px),
+    rgba(0, 0, 0, 0.35) calc(50% - var(--ancho-limpio) / 2),
+    rgba(0, 0, 0, 0.35) calc(50% + var(--ancho-limpio) / 2),
+    #000 calc(50% + var(--ancho-limpio) / 2 + 60px));
+  position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
+  -webkit-mask-image: var(--mascara-vertical), var(--mascara-centro), var(--mascara-cabecera);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--mascara-vertical), var(--mascara-centro), var(--mascara-cabecera);
+  mask-composite: intersect;
+}
+.particulas-claras--planes { --ancho-limpio: 1168px; --cabecera-y: 170px; }
 .planes__subtitulo { max-width: 60ch; margin: var(--e3) auto 0; font-size: var(--t-lg); color: var(--texto-suave); }
 .planes__provisional { margin-top: var(--e3); }
 .planes__rejilla { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--e5); align-items: stretch; }
