@@ -27,3 +27,8 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Archivos generados o temporales que no van al repositorio
+__pycache__/
+*.pyc
+~$*
