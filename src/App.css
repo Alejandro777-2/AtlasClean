@@ -125,9 +125,12 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 /* Progreso: "Paso 1 de 6" y seis segmentos (el primero en cian). */
 .intake__progreso { display: grid; gap: var(--e2); }
 .intake__paso { font-size: 13px; font-weight: 600; color: var(--info); }
-.intake__segmentos { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
-.intake__segmentos span { height: 4px; border-radius: 999px; background: var(--linea); }
-.intake__segmentos span:first-child { background: var(--cian); }
+/* Recorrido del cliente (3 pasos con nombre): la barra de cada paso va encima de su nombre. */
+.intake__segmentos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.intake__segmento { display: grid; gap: 6px; font-size: 12px; color: var(--texto-suave); }
+.intake__segmento::before { content: ''; height: 4px; border-radius: 999px; background: var(--linea); }
+.intake__segmento--actual { font-weight: 600; color: var(--info); }
+.intake__segmento--actual::before { background: var(--cian); }
 
 /* Modos como tarjetas seleccionables (pestañas). El 2.º px del borde activo es un box-shadow
    para que no cambie el tamaño al seleccionar. */

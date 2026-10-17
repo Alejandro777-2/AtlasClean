@@ -27,7 +27,14 @@ const MODOS = [
     )
   }
 ];
-const SEGMENTOS = 6;
+// Recorrido real del cliente: esta tarjeta, el formulario completo (con la IA) y la cotización previa.
+// El primer paso cambia de nombre según el modo elegido.
+const RECORRIDO = [
+  { id: 'inicio', etiqueta: { formulario: 'Datos del lugar', documento: 'Tu pliego' } },
+  { id: 'formulario', etiqueta: 'Tu formulario' },
+  { id: 'cotizacion', etiqueta: 'Cotización previa' }
+];
+const nombrePaso = (p, modo) => (typeof p.etiqueta === 'string' ? p.etiqueta : p.etiqueta[modo]);
 // Mismas tipologías y turnos que usa la plataforma.
 const TIPOS_SITIO = [
   'Salud / Salas de hospitalización / Áreas críticas hospitalarias',
@@ -277,12 +284,16 @@ export default function Portada({ sesion }) {
           </div>
           <div className="intake" data-aparecer>
             <div className="intake__progreso">
-              <p className="intake__paso">Paso 1 de 6 · Requisitos</p>
-              <div className="intake__segmentos" aria-hidden="true">
-                {Array.from({ length: SEGMENTOS }, (_, i) => (
-                  <span key={i} />
+              <p className="intake__paso">
+                Cotiza en {RECORRIDO.length} pasos
+              </p>
+              <ol className="intake__segmentos" aria-label="Tu recorrido para cotizar">
+                {RECORRIDO.map((p, i) => (
+                  <li key={p.id} className={i === 0 ? 'intake__segmento intake__segmento--actual' : 'intake__segmento'} aria-current={i === 0 ? 'step' : undefined}>
+                    {nombrePaso(p, modo)}
+                  </li>
                 ))}
-              </div>
+              </ol>
             </div>
 
             <div className="modos" role="tablist" aria-label="Cómo quieres empezar" onKeyDown={alTeclearModos}>
