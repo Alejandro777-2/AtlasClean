@@ -7,6 +7,12 @@
 /* Divisores ondulados entre secciones (componente Ola). Alto fijo y ancho al 100 %; se solapan 1px
    con la sección vecina para que no quede ninguna línea fina entre ambas. */
 :root { --ola: 72px; }
+
+/* Aparición al hacer scroll (lógica en Portada.jsx). Solo con JS (html.js): sin él no hay estado
+   oculto y todo se ve. Anima solo opacity y transform; --retraso escalona cada sección. */
+html.js [data-estado-aparicion='oculto'] { opacity: 0; transform: translateY(16px); }
+html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out var(--retraso, 0ms), transform 450ms ease-out var(--retraso, 0ms); }
+@media (prefers-reduced-motion: reduce) { html.js [data-estado-aparicion] { opacity: 1; transform: none; transition: none; } }
 .ola { position: absolute; left: 0; width: 100%; height: calc(var(--ola) + 1px); display: block; pointer-events: none; }
 .ola--abajo { bottom: -1px; }
 .ola--arriba { top: -1px; }

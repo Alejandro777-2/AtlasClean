@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AtlasLogo, Boton, Campo, Ola } from '../components/ui.jsx';
 import ComoFunciona from './ComoFunciona.jsx';
 import SubirPliego from './SubirPliego.jsx';
@@ -109,6 +109,50 @@ export default function Portada({ sesion }) {
   };
 
 
+  // Aparición al hacer scroll: los elementos con data-aparecer (también los de ComoFunciona) se
+  // ocultan antes del primer pintado y aparecen al entrar en pantalla, escalonados 80 ms dentro de
+  // cada sección (máx. 6 pasos). Una sola vez: después se quita el estado y se dejan de observar.
+  // React no gestiona data-estado-aparicion, así que sus re-renderizados no lo pisan. Lo que se
+  // monte después (p. ej. el acordeón al pasar a móvil) no se marca y se ve directamente.
+  useLayoutEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const elementos = [...document.querySelectorAll('[data-aparecer]')];
+    const porSeccion = new Map();
+    for (const el of elementos) {
+      const seccion = el.closest('section');
+      const i = porSeccion.get(seccion) ?? 0;
+      porSeccion.set(seccion, i + 1);
+      el.style.setProperty('--retraso', `${Math.min(i, 5) * 80}ms`);
+      el.dataset.estadoAparicion = 'oculto';
+    }
+    const alTerminar = (e) => {
+      if (e.target !== e.currentTarget || e.propertyName !== 'opacity') return;
+      const el = e.currentTarget;
+      el.removeEventListener('transitionend', alTerminar);
+      el.removeAttribute('data-estado-aparicion');
+      el.style.removeProperty('--retraso');
+    };
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        for (const entrada of entradas) {
+          if (!entrada.isIntersecting) continue;
+          entrada.target.addEventListener('transitionend', alTerminar);
+          entrada.target.dataset.estadoAparicion = 'visible';
+          observador.unobserve(entrada.target);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    elementos.forEach((el) => observador.observe(el));
+    return () => {
+      observador.disconnect();
+      for (const el of elementos) {
+        el.removeEventListener('transitionend', alTerminar);
+        el.removeAttribute('data-estado-aparicion');
+      }
+    };
+  }, []);
+
   // Pausa las animaciones del fondo cuando el hero sale de pantalla (ahorra batería).
   const heroRef = useRef(null);
   const [visible, setVisible] = useState(true);
@@ -164,7 +208,7 @@ export default function Portada({ sesion }) {
                   Ver cómo funciona <span aria-hidden="true">↓</span>
                 </Boton>
               </div>
-              <ul className="hero__beneficios">
+              <ul className="hero__beneficios" data-aparecer>
                 {BENEFICIOS.map((b) => (
                   <li key={b.texto}>
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -181,10 +225,12 @@ export default function Portada({ sesion }) {
 
         <section id="cotizar" className="seccion">
           <div className="seccion__cab">
-            <p className="antetitulo">Cotizar</p>
-            <h2>Cuéntanos sobre el lugar</h2>
+            <p className="antetitulo" data-aparecer>
+              Cotizar
+            </p>
+            <h2 data-aparecer>Cuéntanos sobre el lugar</h2>
           </div>
-          <div className="intake">
+          <div className="intake" data-aparecer>
             <div className="intake__progreso">
               <p className="intake__paso">Paso 1 de 6 · Requisitos</p>
               <div className="intake__segmentos" aria-hidden="true">
