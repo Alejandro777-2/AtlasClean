@@ -15,23 +15,25 @@ const cx = (...c) => c.filter(Boolean).join(' ');
  * Las formas se salen del viewBox por los lados y por el extremo lleno: así el desenfoque solo se
  * nota en la curva y no deja bordes transparentes.
  */
+// viewBox de 1440×200 estirado a la altura de --ola. La curva va por el centro (y≈60–140) para que
+// el desenfoque (σ 20 en el borde, 28 en el tono medio) se apague antes de los bordes del SVG.
 const OLAS = {
-  abajo: (dy) => `M-240,${70 - dy} C120,${112 - dy} 480,${112 - dy} 720,${78 - dy} C960,${44 - dy} 1260,${40 - dy} 1680,${66 - dy} L1680,320 L-240,320 Z`,
-  arriba: (dy) => `M-240,-200 L1680,-200 L1680,${44 + dy} C1260,${76 + dy} 960,${72 + dy} 720,${40 + dy} C480,${8 + dy} 120,${4 + dy} -240,${40 + dy} Z`
+  abajo: (dy) => `M-240,${110 - dy} C120,${140 - dy} 480,${140 - dy} 720,${108 - dy} C960,${76 - dy} 1260,${72 - dy} 1680,${98 - dy} L1680,500 L-240,500 Z`,
+  arriba: (dy) => `M-240,-300 L1680,-300 L1680,${90 + dy} C1260,${124 + dy} 960,${120 + dy} 720,${88 + dy} C480,${56 + dy} 120,${52 + dy} -240,${88 + dy} Z`
 };
 export function Ola({ lado = 'abajo', color, colorMedio, className }) {
   const id = useId();
   return (
-    <svg className={cx('ola', `ola--${lado}`, className)} viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <svg className={cx('ola', `ola--${lado}`, className)} viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true" focusable="false">
       <defs>
         <filter id={`${id}-medio`} x="-10%" y="-60%" width="120%" height="220%">
-          <feGaussianBlur stdDeviation="14" />
+          <feGaussianBlur stdDeviation="28" />
         </filter>
         <filter id={`${id}-borde`} x="-10%" y="-60%" width="120%" height="220%">
-          <feGaussianBlur stdDeviation="9" />
+          <feGaussianBlur stdDeviation="20" />
         </filter>
       </defs>
-      {colorMedio && <path d={OLAS[lado](12)} style={{ fill: colorMedio }} filter={`url(#${id}-medio)`} />}
+      {colorMedio && <path d={OLAS[lado](16)} style={{ fill: colorMedio }} filter={`url(#${id}-medio)`} />}
       <path d={OLAS[lado](0)} style={{ fill: color }} filter={`url(#${id}-borde)`} />
     </svg>
   );

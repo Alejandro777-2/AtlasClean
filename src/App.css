@@ -37,7 +37,7 @@
    ancho al 100 %; se solapan 1px con la sección vecina para que no quede ninguna línea fina.
    --ola-medio: tono intermedio del borde (azul claro mezclado en oklab) para evitar el gris turbio
    que sale al mezclar marino y crema directamente. */
-:root { --ola: 120px; --ola-medio: color-mix(in oklab, var(--azul) 45%, var(--crema)); }
+:root { --ola: 140px; --ola-medio: color-mix(in oklab, var(--azul) 45%, var(--crema)); }
 
 /* Aparición al hacer scroll (lógica en Portada.jsx). Solo con JS (html.js): sin él no hay estado
    oculto y todo se ve. Anima solo opacity y transform; --retraso escalona cada sección. */
@@ -55,7 +55,8 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
   display: flex; flex-direction: column; justify-content: center;
   min-height: max(calc(640px + var(--alto-nav)), 100vh);
   min-height: max(calc(640px + var(--alto-nav)), 100svh);
-  padding: calc(var(--alto-nav) + 32px) 0 calc(var(--ola) + 32px); color: #fff;
+  /* Al menos 48px entre el nav y la primera línea del titular, aunque el contenido no quepa centrado. */
+  padding: calc(var(--alto-nav) + 48px) 0 calc(var(--ola) + 24px); color: #fff;
   background:
     radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--cian) 18%, transparent), transparent 45%),
     radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--azul) 20%, transparent), transparent 50%),
@@ -360,7 +361,7 @@ html.js [data-estado-aparicion='visible'] { transition: opacity 450ms ease-out v
 @media (max-width: 700px) {
   /* Móvil: nav de 68px que ya no se compacta, ola de 72px, titular de al menos 2.25rem y botones
      en columna a lo ancho. */
-  :root { --alto-nav: 68px; --alto-nav-compacto: 68px; --nav-escala: 1; --nav-sube: 0px; --ola: 72px; }
+  :root { --alto-nav: 68px; --alto-nav-compacto: 68px; --nav-escala: 1; --nav-sube: 0px; --ola: 80px; }
   .hero h1 { font-size: clamp(2.25rem, 5.6vw, 4.75rem); }
   .hero__acciones { flex-direction: column; align-items: center; }
   .hero__acciones .boton { width: 100%; max-width: 340px; }
