@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://platform.claude.com/schemas/ant/beta/environment.json
+name: atlas-visita-env
+metadata: {}
+scope: organization
+config:
+  type: cloud
+  packages:
+    pip: []
+    npm: []
+    apt: []
+    cargo: []
+    gem: []
+    go: []
+  # Sin acceso a internet: el agente solo analiza lo que Atlas le envía.
+  networking:
+    type: limited

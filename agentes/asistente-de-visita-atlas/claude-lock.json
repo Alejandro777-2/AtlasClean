@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "resources": {
+    "./agents/asistente-de-visita-atlas.md": {
+      "kind": "agent",
+      "id": "agent_01HgcTnu3XtEv4jLngbFcoY6",
+      "version": "1",
+      "hash": ""
+    },
+    "./environments/atlas-visita-env.yml": {
+      "kind": "environment",
+      "id": "env_0141AXSqsHpvxXZujoq6HQCe",
+      "hash": ""
+    }
+  }
+}

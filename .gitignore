@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claves y configuración local (nunca a git)
+.env
+.env.*
+!.env.example

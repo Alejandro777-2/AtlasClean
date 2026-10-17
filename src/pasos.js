@@ -7,3 +7,17 @@ export const PASOS = [
   { id: 'costos', nombre: 'Costos', descripcion: 'Junta todo en un solo lugar y calcula el precio final.' },
   { id: 'propuesta', nombre: 'Propuesta', descripcion: 'Arma la propuesta para el cliente y sigue su aprobación paso a paso, con historial de cambios.' }
 ];
+
+// Sección previa a la cotización: formulario del cliente + Asistente de Visita (IA). Ruta: #/app/visita.
+export const VISITA = {
+  id: 'visita',
+  nombre: 'Asistente de visita',
+  descripcion: 'El cliente describe el lugar y, si tiene, sube su pliego. La IA prepara la ficha para el técnico que hará la visita.'
+};
+
+// Registro detallado del formulario. Se abre en una ventana nueva: #/app/registro.
+export const REGISTRO = {
+  id: 'registro',
+  nombre: 'Registro del formulario',
+  descripcion: 'Todos los datos que dio el cliente, con su estado. Se actualiza solo al editar el formulario en la otra ventana.'
+};

@@ -26,10 +26,13 @@ export function Insignia({ tono = 'neutro', children }) {
   return <span className={cx('insignia', tono !== 'neutro' && `insignia--${tono}`)}>{children}</span>;
 }
 
-/** variante: 'destacada' | 'oscura'. Sin `valor` muestra un guion: nunca cifras inventadas. */
-export function TarjetaKpi({ etiqueta, valor = '—', detalle, variante }) {
+/**
+ * variante: 'destacada' | 'oscura'. Sin `valor` muestra un guion: nunca cifras inventadas.
+ * `compacta`: para valores de texto (p. ej. un requisito del pliego) en lugar de una cifra.
+ */
+export function TarjetaKpi({ etiqueta, valor = '—', detalle, variante, compacta }) {
   return (
-    <div className={cx('kpi', variante && `kpi--${variante}`)}>
+    <div className={cx('kpi', variante && `kpi--${variante}`, compacta && 'kpi--compacta')}>
       <span className="kpi__etiqueta">{etiqueta}</span>
       <span className="kpi__valor">{valor}</span>
       {detalle && <span className="kpi__detalle">{detalle}</span>}
@@ -37,16 +40,76 @@ export function TarjetaKpi({ etiqueta, valor = '—', detalle, variante }) {
   );
 }
 
-/** `children` es una función que recibe el id para enlazar la etiqueta con el control. */
-export function Campo({ etiqueta, ayuda, children }) {
+/**
+ * `children` es una función que recibe el id para enlazar la etiqueta con el control y, como segundo
+ * argumento, los atributos de accesibilidad del error ({ 'aria-invalid', 'aria-describedby' }).
+ */
+export function Campo({ etiqueta, ayuda, error, opcional, children }) {
   const id = useId();
+  const idError = `${id}-error`;
+  const accesible = error ? { 'aria-invalid': true, 'aria-describedby': idError } : {};
   return (
     <div className="campo">
       <label className="campo__etiqueta" htmlFor={id}>
         {etiqueta}
+        {opcional && <span className="campo__opcional"> (opcional)</span>}
       </label>
-      {children(id)}
-      {ayuda && <span className="campo__ayuda">{ayuda}</span>}
+      {children(id, accesible)}
+      {error ? (
+        <span className="campo__error" id={idError}>
+          {error}
+        </span>
+      ) : (
+        ayuda && <span className="campo__ayuda">{ayuda}</span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Grupo de opciones de una sola elección (radio) o de varias (casillas), con aspecto de pastillas.
+ * opciones: [{ valor, etiqueta, ayuda? }]. Con `multiple`, `valor` es una lista.
+ */
+export function Opciones({ etiqueta, opciones, valor, alCambiar, multiple = false, error, ayuda, nombre }) {
+  const id = useId();
+  const grupo = nombre ?? id;
+  const marcado = (v) => (multiple ? valor.includes(v) : valor === v);
+  const elegir = (v) => {
+    if (!multiple) return alCambiar(v);
+    alCambiar(valor.includes(v) ? valor.filter((x) => x !== v) : [...valor, v]);
+  };
+  return (
+    <fieldset className="opciones" aria-describedby={error ? `${id}-error` : undefined}>
+      <legend className="campo__etiqueta">{etiqueta}</legend>
+      <div className="opciones__lista">
+        {opciones.map((o) => (
+          <label key={o.valor} className={cx('opcion', marcado(o.valor) && 'opcion--marcada')}>
+            <input type={multiple ? 'checkbox' : 'radio'} name={grupo} value={o.valor} checked={marcado(o.valor)} onChange={() => elegir(o.valor)} className="visualmente-oculto" />
+            <span className="opcion__texto">{o.etiqueta}</span>
+            {o.ayuda && <span className="opcion__ayuda">{o.ayuda}</span>}
+          </label>
+        ))}
+      </div>
+      {error ? (
+        <span className="campo__error" id={`${id}-error`}>
+          {error}
+        </span>
+      ) : (
+        ayuda && <span className="campo__ayuda">{ayuda}</span>
+      )}
+    </fieldset>
+  );
+}
+
+/** Mensaje destacado. tono: 'info' | 'ok' | 'aviso' | 'error' */
+export function Aviso({ tono = 'info', titulo, children, acciones }) {
+  return (
+    <div className={cx('aviso', `aviso--${tono}`)} role={tono === 'error' ? 'alert' : 'status'}>
+      <div>
+        {titulo && <p className="aviso__titulo">{titulo}</p>}
+        {children && <div className="aviso__texto">{children}</div>}
+      </div>
+      {acciones && <div className="aviso__acciones">{acciones}</div>}
     </div>
   );
 }
@@ -109,7 +172,7 @@ export function Pestanas({ opciones, valor, alCambiar, etiqueta }) {
   return (
     <div className="pestanas" role="tablist" aria-label={etiqueta}>
       {opciones.map((o) => (
-        <button key={o.valor} type="button" role="tab" aria-selected={o.valor === valor} className="pestanas__boton" onClick={() => alCambiar(o.valor)}>
+        <button key={o.valor} type="button" role="tab" aria-selected={o.valor === valor} className="pestanas__boton" disabled={o.deshabilitada} title={o.ayuda} onClick={() => alCambiar(o.valor)}>
           {o.etiqueta}
         </button>
       ))}

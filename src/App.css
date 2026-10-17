@@ -71,6 +71,8 @@
 }
 .lateral__num { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--marino-linea); font-size: var(--t-xs); font-weight: 800; }
 .lateral__paso[aria-current='page'] .lateral__num { border-color: var(--cian); color: var(--cian); }
+.lateral__nav { display: grid; gap: var(--e5); }
+.lateral__num--ia { border-color: var(--cian); color: var(--cian); font-size: 0.625rem; }
 .lateral__volver { margin-top: auto; padding: var(--e3) var(--e3) 0; border-top: 1px solid var(--marino-linea); font-size: var(--t-sm); text-decoration: none; color: var(--texto-sobre-marino-suave); }
 .lateral__volver:hover { color: #fff; }
 
@@ -85,6 +87,115 @@
 .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--e3); }
 .leyenda-riesgo { display: flex; flex-wrap: wrap; gap: var(--e2); margin-bottom: var(--e4); }
 
+/* ── Paso 1: formulario del cliente ── */
+.formulario { display: grid; gap: var(--e5); }
+.formulario__cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); }
+.formulario__cabecera p { max-width: 70ch; }
+.bloque { display: grid; gap: var(--e4); margin: 0; padding: var(--e5); border: 1px solid var(--linea); border-radius: var(--radio-lg); background: var(--superficie); min-width: 0; }
+.bloque__titulo { display: flex; align-items: center; gap: var(--e2); padding: 0 var(--e2); font-size: var(--t-md); font-weight: 800; }
+.bloque__num { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--info-suave); color: var(--info); font-size: var(--t-xs); font-weight: 800; }
+.bloque__rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e4); align-items: start; }
+.subida--compacta { padding: var(--e4); }
+.documento { display: flex; align-items: center; justify-content: space-between; gap: var(--e3); padding: var(--e3) var(--e4); border: 1px solid var(--linea); border-radius: var(--radio); background: var(--superficie-2); }
+.documento div { display: grid; gap: 2px; min-width: 0; }
+.documento strong { overflow-wrap: anywhere; }
+.formulario__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e3); padding-top: var(--e2); border-top: 1px solid var(--linea); }
+.formulario__estado { font-size: var(--t-sm); }
+
+/* ── Paso 1: ficha previa a la visita ── */
+.kpis--ficha { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.visita__cabecera { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--e4); margin-bottom: var(--e5); }
+.visita__cabecera .panel__desc { margin-bottom: 0; }
+.visita__pestanas { flex: 0 1 420px; min-width: 0; display: grid; gap: var(--e2); justify-items: end; }
+.visita__pestanas .pestanas { width: 100%; }
+.superior__desc { margin: var(--e1) 0 0; font-size: var(--t-sm); color: var(--texto-suave); }
+.registro { display: grid; gap: var(--e5); }
+.registro__acciones { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--e2); }
+.registro__bloque h2 { display: flex; align-items: center; gap: var(--e2); margin-bottom: var(--e4); }
+.registro__valor { white-space: pre-wrap; }
+@media (min-width: 760px) {
+  .registro .tabla { table-layout: fixed; }
+  .registro .tabla th:first-child { width: 36%; }
+  .registro .tabla th:last-child { width: 200px; }
+}
+.registro__tecnico summary { cursor: pointer; font-weight: 700; }
+.registro__tecnico pre { margin: var(--e4) 0 0; padding: var(--e4); overflow-x: auto; font-size: var(--t-xs); background: var(--superficie-2); border-radius: var(--radio); }
+.ficha__requisitos li { display: flex; align-items: flex-start; gap: var(--e3); }
+.ficha__requisitos .insignia { flex: none; min-width: 64px; justify-content: center; }
+.ficha__lista--avisos.ficha__lista--neutra li { background: var(--info-suave); border-left-color: var(--info); }
+.error-pantalla { display: grid; gap: var(--e5); max-width: 720px; margin: 0 auto; padding: var(--e6) var(--e4); }
+.ficha { display: grid; gap: var(--e5); }
+.ficha__cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); }
+.ficha__insignias, .ficha__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); }
+.ficha__fecha { font-size: var(--t-xs); }
+.ficha__seccion { display: grid; gap: var(--e3); align-content: start; min-width: 0; }
+.ficha__seccion h3 { font-size: var(--t-md); font-weight: 800; }
+.ficha__titulo-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e2); }
+.ficha__resumen { font-size: var(--t-lg); max-width: 75ch; }
+.ficha__estimacion { font-size: var(--t-sm); }
+.ficha__rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e5) var(--e6); }
+.ficha__lista { margin: 0; padding: 0; display: grid; gap: var(--e3); }
+.ficha__lista li { font-size: var(--t-sm); }
+.ficha__lista--avisos { list-style: none; }
+.ficha__lista--avisos li { display: grid; gap: 2px; padding: var(--e3) var(--e4); border-radius: var(--radio); background: var(--aviso-suave); border-left: 4px solid var(--aviso); }
+.ficha__chequeo { list-style: none; }
+.ficha__chequeo label { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--e3); align-items: start; padding: var(--e3); border: 1px solid var(--linea); border-radius: var(--radio); cursor: pointer; }
+.ficha__chequeo label:hover { border-color: var(--texto-suave); }
+.ficha__chequeo input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--ok); }
+.ficha__hecho { background: var(--ok-suave); border-color: transparent; }
+.ficha__hecho strong { text-decoration: line-through; color: var(--texto-suave); }
+.zona { display: grid; gap: 2px; }
+.ficha__desde-documento { margin: var(--e1) 0 0; padding-left: var(--e4); display: grid; gap: 2px; }
+.zona__categoria { font-size: var(--t-xs); }
+.ficha__porque { display: block; margin-top: 2px; }
+.ficha__numerada, .ficha__vinetas { padding-left: var(--e5); }
+
+@media (max-width: 900px) {
+  .bloque__rejilla, .ficha__rejilla { grid-template-columns: 1fr; }
+  .kpis--ficha { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bloque { padding: var(--e4); }
+}
+
+/* Imprimir la ficha: solo el contenido, sin barra lateral ni botones. */
+@media print {
+  body { background: #fff; }
+  .lateral, .superior, .kpis, .ficha__acciones, .aviso__acciones, .visita__pestanas, .registro__acciones, .registro__tecnico { display: none !important; }
+  .plataforma { display: block; }
+  .contenido { padding: 0; }
+  .panel { border: 0; box-shadow: none; padding: 0; }
+  .ficha__chequeo label, .ficha__lista--avisos li { break-inside: avoid; }
+  .solo-pantalla { display: none !important; }
+  .solo-impresion, .presupuesto__membrete { display: flex !important; flex-direction: column; gap: 2px; margin-bottom: var(--e4); }
+  .presupuesto .presupuesto__resumen { background: #fff; color: var(--texto); border: 2px solid var(--marino); }
+  .presupuesto .presupuesto__resumen .antetitulo, .presupuesto .presupuesto__unidad, .presupuesto .presupuesto__extra dt { color: var(--texto-suave); }
+  .contacto, .presupuesto .tabla tr { break-inside: avoid; }
+  .panel:has(.presupuesto) > h2, .panel:has(.presupuesto) > .panel__desc { display: none; }
+}
+
+/* ── Presupuesto previo y contacto (paso Costos) ── */
+.presupuesto__resumen {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--e5);
+  padding: var(--e5); border-radius: var(--radio-lg); background: var(--marino); color: #fff;
+}
+.presupuesto__resumen .antetitulo { color: var(--cian); margin: 0; }
+.presupuesto__cifra { margin: var(--e2) 0 0; font-size: var(--t-2xl); font-weight: 800; font-variant-numeric: tabular-nums; }
+.presupuesto__unidad { margin: 0; color: var(--texto-sobre-marino); font-size: var(--t-md); }
+.presupuesto__extra { display: grid; gap: var(--e3); margin: 0; }
+.presupuesto__extra dt { font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-sobre-marino-suave); }
+.presupuesto__extra dd { margin: 2px 0 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.presupuesto__acciones { display: flex; flex-wrap: wrap; gap: var(--e2); }
+.presupuesto__membrete { display: none; }
+.contacto { display: grid; gap: var(--e4); padding: var(--e5); border: 1px solid var(--linea); border-radius: var(--radio-lg); background: var(--superficie-2); }
+.contacto__cabecera { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--e3); }
+.contacto__cabecera h3 { margin: var(--e1) 0; }
+.contacto__cabecera .antetitulo, .contacto__cabecera p { margin: 0; }
+.contacto__medios, .contacto__redes { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--e3); grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.contacto__medio { display: grid; gap: 2px; padding: var(--e3) var(--e4); border-radius: var(--radio); background: var(--superficie); border: 1px solid var(--linea); }
+.contacto__redes li { display: grid; gap: 2px; }
+.contacto__rotulo { font-size: var(--t-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-suave); }
+.contacto a { font-weight: 700; color: var(--marino); overflow-wrap: anywhere; }
+.solo-impresion { display: none; }
+
 /* ── Pantallas pequeñas ── */
 @media (max-width: 1100px) {
   .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -95,6 +206,9 @@
   .plataforma { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; grid-template-areas: 'lateral' 'superior' 'contenido'; }
   .lateral { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--e3); padding: var(--e3) var(--e4); }
   .lateral nav { flex-basis: 100%; min-width: 0; }
+  .lateral__nav { display: flex; gap: 2px; overflow-x: auto; }
+  .lateral__grupo { flex: none; }
+  .visita__pestanas { flex-basis: 100%; }
   .lateral__rotulo, .lateral__volver { display: none; }
   .lateral__pasos { display: flex; overflow-x: auto; }
   .lateral__paso { white-space: nowrap; }
