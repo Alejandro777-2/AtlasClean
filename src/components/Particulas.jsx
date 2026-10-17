@@ -1,13 +1,14 @@
 /**
  * Fondo de partículas en <canvas> (decorativo). Puntos que derivan lento y se unen con líneas
- * cuando están cerca; el tema claro añade unos anillos huecos que derivan igual.
+ * cuando están cerca; el tema claro añade dos grupos de anillos concéntricos con un pin.
  * Pausa fuera de pantalla o con la pestaña oculta (cada canvas por separado); con
- * prefers-reduced-motion dibuja un solo fotograma.
+ * prefers-reduced-motion dibuja un solo fotograma. En desarrollo, ?motion=on en la URL ignora
+ * reduced-motion para poder probar la animación.
  *
  * `tema`: 'oscuro' (secciones azules) o 'claro' (secciones beige). `opciones` sobrescribe
  * cualquier parámetro del tema. Los colores son nombres de variables CSS (tokens).
  * `cantidad` / `cantidadMovil`: puntos en escritorio y por debajo de 900px.
- * El atributo data-animando ("1"/"0") indica si el bucle está corriendo.
+ * Atributos para diagnóstico: data-animando ("1"/"0") y data-tamano ("ancho×alto").
  */
 import { useEffect, useRef } from 'react';
 
@@ -20,21 +21,34 @@ const TEMAS = {
     velocidad: [0.15, 0.35],
     distancia: 130,
     opacidadLinea: 0.15,
-    anillos: null
+    laterales: null,
+    grupos: null
   },
   claro: {
-    colores: ['--particula-clara'],
-    colorLinea: '--particula-clara',
-    opacidad: [0.08, 0.22],
-    radio: [0.75, 1.5], // diámetro 1.5–3px
-    velocidad: [0.1, 0.22],
-    distancia: 140,
-    opacidadLinea: 0.07,
-    anillos: { cantidad: 3, radio: [8, 14], color: '--azul', opacidad: 0.15 }
+    colores: ['--info'], // azul de acento
+    colorLinea: '--info',
+    opacidad: [0.25, 0.5],
+    radio: [1, 2], // diámetro 2–4px
+    velocidad: [0.12, 0.25],
+    distancia: 160,
+    opacidadLinea: 0.18,
+    // 70 % de los puntos en las franjas laterales, fuera del ancho central de las tarjetas.
+    laterales: { proporcion: 0.7, anchoCentral: 720 },
+    // Dos grupos de anillos concéntricos en esquinas opuestas, en parte fuera de la sección.
+    grupos: {
+      color: '--info',
+      anillos: 6,
+      radioExterior: [260, 340],
+      opacidad: [0.1, 0.16],
+      amplitud: [60, 100], // px de deriva
+      periodo: [45000, 70000], // ms por ciclo
+      pin: { radio: 5, halo: 16, opacidad: 0.28 }
+    }
   }
 };
 
 const entre = ([min, max]) => min + Math.random() * (max - min);
+const forzarMovimiento = () => import.meta.env.DEV && new URLSearchParams(window.location.search).get('motion') === 'on';
 
 export default function Particulas({ tema = 'oscuro', opciones, cantidad, cantidadMovil = cantidad, className }) {
   const ref = useRef(null);
@@ -48,32 +62,83 @@ export default function Particulas({ tema = 'oscuro', opciones, cantidad, cantid
     const color = (nombre) => estilos.getPropertyValue(nombre).trim();
     const colores = cfg.colores.map(color);
     const colorLinea = color(cfg.colorLinea);
-    const colorAnillo = cfg.anillos && color(cfg.anillos.color);
-    const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const colorGrupo = cfg.grupos && color(cfg.grupos.color);
+    const reducir = !forzarMovimiento() && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const movil = window.matchMedia('(max-width: 900px)');
     let ancho = 0;
     let alto = 0;
     let puntos = [];
-    let anillos = [];
+    let grupos = [];
     let raf = 0;
     let visible = true;
+    let tiempo = 0;
 
-    const deriva = () => {
+    // Franja horizontal donde vive cada punto: lateral izquierda, lateral derecha o todo el ancho.
+    const franja = () => {
+      const lat = cfg.laterales;
+      const anchoLateral = lat ? (ancho - lat.anchoCentral) / 2 : 0;
+      if (!lat || anchoLateral < 40 || Math.random() >= lat.proporcion) return [0, ancho];
+      return Math.random() < 0.5 ? [0, anchoLateral] : [ancho - anchoLateral, ancho];
+    };
+    const crearPunto = () => {
+      const [x0, x1] = franja();
       const angulo = Math.random() * Math.PI * 2;
       const v = entre(cfg.velocidad);
-      return { x: Math.random() * ancho, y: Math.random() * alto, vx: Math.cos(angulo) * v, vy: Math.sin(angulo) * v };
+      return {
+        x0,
+        x1,
+        x: x0 + Math.random() * (x1 - x0),
+        y: Math.random() * alto,
+        vx: Math.cos(angulo) * v,
+        vy: Math.sin(angulo) * v,
+        r: entre(cfg.radio),
+        a: entre(cfg.opacidad),
+        color: colores.length > 1 && Math.random() >= 0.6 ? colores[1] : colores[0]
+      };
     };
-    const crearPunto = () => ({
-      ...deriva(),
-      r: entre(cfg.radio),
-      a: entre(cfg.opacidad),
-      color: colores.length > 1 && Math.random() >= 0.6 ? colores[1] : colores[0]
-    });
-    const crearAnillo = () => ({ ...deriva(), r: entre(cfg.anillos.radio) });
+    // Esquinas opuestas: arriba a la derecha y abajo a la izquierda, con el centro algo fuera.
+    const crearGrupos = () => {
+      const g = cfg.grupos;
+      if (!g) return [];
+      return [
+        { cx: ancho - 40, cy: 30 },
+        { cx: 40, cy: alto - 30 }
+      ].map((pos, i) => ({
+        ...pos,
+        rExt: entre(g.radioExterior),
+        a: entre(g.opacidad),
+        ax: entre(g.amplitud) * (i ? 1 : -1),
+        ay: entre(g.amplitud) * 0.6,
+        periodo: entre(g.periodo),
+        fase: Math.random() * Math.PI * 2
+      }));
+    };
 
     const dibujar = () => {
       ctx.clearRect(0, 0, ancho, alto);
       ctx.lineWidth = 1;
+      for (const gr of grupos) {
+        const t = (tiempo / gr.periodo) * Math.PI * 2 + gr.fase;
+        const x = gr.cx + Math.sin(t) * gr.ax;
+        const y = gr.cy + Math.cos(t * 0.8) * gr.ay;
+        ctx.strokeStyle = colorGrupo;
+        ctx.globalAlpha = gr.a;
+        for (let k = 1; k <= cfg.grupos.anillos; k++) {
+          ctx.beginPath();
+          ctx.arc(x, y, (gr.rExt * k) / cfg.grupos.anillos, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        const pin = cfg.grupos.pin;
+        ctx.fillStyle = colorGrupo;
+        ctx.globalAlpha = pin.opacidad * 0.4;
+        ctx.beginPath();
+        ctx.arc(x, y, pin.halo, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = pin.opacidad;
+        ctx.beginPath();
+        ctx.arc(x, y, pin.radio, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.strokeStyle = colorLinea;
       for (let i = 0; i < puntos.length; i++) {
         for (let j = i + 1; j < puntos.length; j++) {
@@ -93,36 +158,30 @@ export default function Particulas({ tema = 'oscuro', opciones, cantidad, cantid
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }
-      if (anillos.length) {
-        ctx.globalAlpha = cfg.anillos.opacidad;
-        ctx.strokeStyle = colorAnillo;
-        for (const a of anillos) {
-          ctx.beginPath();
-          ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-      }
     };
 
-    // Deriva con reaparición por el borde opuesto.
+    // Deriva con reaparición por el borde opuesto de su franja.
     const mover = () => {
       for (const p of puntos) {
-        p.x = (p.x + p.vx + ancho) % ancho;
+        const w = p.x1 - p.x0;
+        p.x = p.x0 + ((p.x - p.x0 + p.vx + w) % w);
         p.y = (p.y + p.vy + alto) % alto;
-      }
-      for (const a of anillos) {
-        a.x = (a.x + a.vx + ancho) % ancho;
-        a.y = (a.y + a.vy + alto) % alto;
       }
     };
 
-    const bucle = () => {
+    let anterior = 0;
+    const bucle = (ahora) => {
+      tiempo += anterior ? Math.min(ahora - anterior, 50) : 16;
+      anterior = ahora;
       mover();
       dibujar();
       raf = requestAnimationFrame(bucle);
     };
     const arrancar = () => {
-      if (!raf && visible && !document.hidden && !reducir) raf = requestAnimationFrame(bucle);
+      if (!raf && visible && !document.hidden && !reducir) {
+        anterior = 0;
+        raf = requestAnimationFrame(bucle);
+      }
       canvas.dataset.animando = raf ? '1' : '0';
     };
     const parar = () => {
@@ -133,15 +192,17 @@ export default function Particulas({ tema = 'oscuro', opciones, cantidad, cantid
 
     const ajustar = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const cambioAncho = canvas.clientWidth !== ancho;
       ancho = canvas.clientWidth;
       alto = canvas.clientHeight;
       canvas.width = ancho * dpr;
       canvas.height = alto * dpr;
+      canvas.dataset.tamano = `${ancho}×${alto}`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const n = movil.matches ? cantidadMovil : cantidad;
-      if (puntos.length !== n) puntos = Array.from({ length: n }, crearPunto);
-      const nAnillos = cfg.anillos?.cantidad ?? 0;
-      if (anillos.length !== nAnillos) anillos = Array.from({ length: nAnillos }, crearAnillo);
+      // Las franjas dependen del ancho: si cambia, se reparten de nuevo.
+      if (puntos.length !== n || cambioAncho) puntos = Array.from({ length: n }, crearPunto);
+      grupos = crearGrupos();
       dibujar();
     };
 

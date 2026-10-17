@@ -13,7 +13,14 @@ const NOTA = [`Precios en ${CONFIG_PLANES.moneda}.`, CONFIG_PLANES.notaIva, CONF
 export default function Planes() {
   return (
     <section id="planes" className="planes">
-      <Particulas tema="claro" cantidad={28} cantidadMovil={14} className="particulas-claras particulas-claras--planes" />
+      {/* Las tarjetas ocupan ~1168px: las franjas laterales empiezan fuera de ellas. */}
+      <Particulas
+        tema="claro"
+        cantidad={45}
+        cantidadMovil={20}
+        opciones={{ laterales: { proporcion: 0.7, anchoCentral: 1200 } }}
+        className="particulas-claras particulas-claras--planes"
+      />
       <div className="seccion">
         <div className="seccion__cab">
           <p className="antetitulo" data-aparecer>

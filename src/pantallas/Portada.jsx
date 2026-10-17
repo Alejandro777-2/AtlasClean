@@ -260,7 +260,7 @@ export default function Portada({ sesion }) {
 
         {/* Sección a lo ancho (para las partículas) con el contenido en .seccion. */}
         <section id="cotizar" className="cotizar">
-          <Particulas tema="claro" cantidad={28} cantidadMovil={14} className="particulas-claras" />
+          <Particulas tema="claro" cantidad={45} cantidadMovil={20} className="particulas-claras" />
           <div className="seccion">
           <div className="seccion__cab">
             <p className="antetitulo" data-aparecer>
